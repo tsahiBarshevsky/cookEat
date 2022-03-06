@@ -21,10 +21,6 @@ const LoginScreen = ({ navigation }) => {
         return unsubscribe;
     }, []);
 
-    const routes = navigation.getState()?.routes;
-    const prevRoute = routes[routes.length - 2];
-    console.log(prevRoute)
-
     return (
         <View style={styles.container}>
             <TextInput
