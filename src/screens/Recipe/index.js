@@ -1,0 +1,232 @@
+import React, { useState } from 'react';
+import { StyleSheet, StatusBar, Text, View, Image, TouchableOpacity, Linking, Dimensions, SafeAreaView, ScrollView } from 'react-native';
+import { SharedElement } from 'react-navigation-shared-element';
+import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
+import { useSelector, useDispatch } from 'react-redux';
+import * as Animatable from 'react-native-animatable';
+import update from 'immutability-helper';
+import { updateFavorite } from '../../redux/actions/recipes';
+import { Ingredients, Directions, Detail } from '../../components';
+import { background, primary } from '../../utils/palette';
+
+const DURATION = 200;
+const { width } = Dimensions.get('window');
+
+const RecipeScreen = ({ route, navigation }) => {
+    const { item, origin } = route.params;
+    // console.log(item)
+    const recipes = useSelector(state => state.recipes);
+    const dispatch = useDispatch();
+    const [favorite, setFavorite] = useState(item.favorite);
+
+    const handleFavoriteCahnge = (id, favorite) => {
+        setFavorite(favorite);
+        const index = recipes.findIndex(recipes => recipes.id === id);
+        const updatedRecipes = update(recipes, { [index]: { $merge: { favorite: favorite } } });
+        //setRecipesAtStorage(JSON.stringify(updatedRecipes)); // Update AsyncStorage
+        dispatch(updateFavorite(index, favorite)); // Update store
+    }
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <View style={styles.header}>
+                <Animatable.View
+                    animation='zoomIn'
+                    delay={250}
+                    style={[styles.button, styles.save]}
+                >
+                    <TouchableOpacity onPress={() => handleFavoriteCahnge(item.id, !favorite)}>
+                        {favorite ?
+                            <FontAwesome name="bookmark" size={24} color="white" />
+                            :
+                            <FontAwesome name="bookmark-o" size={24} color="white" />
+                        }
+                    </TouchableOpacity>
+                </Animatable.View>
+                <Animatable.View
+                    animation='zoomIn'
+                    delay={250}
+                    style={[styles.button, styles.close]}
+                >
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <Ionicons name="chevron-back" size={26} color="white" />
+                    </TouchableOpacity>
+                </Animatable.View>
+            </View>
+            <View style={{ marginHorizontal: 15 }}>
+                <SharedElement id={`${item.id}.image.${origin}`}>
+                    <Image source={{ uri: item.image }} style={styles.image} />
+                </SharedElement>
+            </View>
+            <View style={styles.detailsContainer}>
+                <View style={styles.detailsHeader}>
+                    <Text style={styles.title}>{item.name}</Text>
+                    {item.youtube &&
+                        <TouchableOpacity style={styles.youtube} activeOpacity={0.9} onPress={() => Linking.openURL(item.youtube)}>
+                            <AntDesign name="youtube" size={30} color='#c4302b' />
+                        </TouchableOpacity>
+                    }
+                </View>
+                <View style={styles.details}>
+                    <Animatable.View
+                        animation='bounceIn'
+                        delay={DURATION}
+                    >
+                        <Detail
+                            type={'time'}
+                            value={`${item.time.value} ${item.time.unit}`}
+                        />
+                    </Animatable.View>
+                    <View style={styles.seperator} />
+                    <Animatable.View
+                        animation='bounceIn'
+                        delay={DURATION + 100}
+                    >
+                        <Detail
+                            type={'quantity'}
+                            value={`${item.quantity} מנות`}
+                        />
+                    </Animatable.View>
+                    <View style={styles.seperator} />
+                    <Animatable.View
+                        animation='bounceIn'
+                        delay={DURATION + 200}
+                    >
+                        <Detail
+                            type={'category'}
+                            value={item.category}
+                        />
+                    </Animatable.View>
+                </View>
+                <Animatable.View
+                    animation='fadeInUp'
+                    delay={DURATION}
+                    style={{ height: '100%', flex: 1 }}
+                >
+                    <ScrollView
+                        horizontal
+                        decelerationRate="fast"
+                        snapToInterval={width}
+                        showsHorizontalScrollIndicator={false}
+                        style={styles.ingredientsAndDirections}
+                        overScrollMode="never"
+                    >
+                        <View style={styles.wrapper}>
+                            <View style={styles.wrapperHeader}>
+                                <Text style={styles.wrapperTitle}>מרכיבים</Text>
+                                <Text style={styles.wrapperNote}>({item.ingredients.length} פריטים)</Text>
+                            </View>
+                            <Ingredients ingredients={item.ingredients} />
+                        </View>
+                        <View style={styles.wrapper}>
+                            <View style={styles.wrapperHeader}>
+                                <Text style={styles.wrapperTitle}>אופן ההכנה</Text>
+                                <Text style={styles.wrapperNote}>({item.directions.length} פריטים)</Text>
+                            </View>
+                            <Directions directions={item.directions} />
+                        </View>
+                    </ScrollView>
+                </Animatable.View>
+            </View>
+        </SafeAreaView>
+    )
+}
+
+RecipeScreen.sharedElements = (route) => {
+    const { item, origin } = route.params;
+    return [
+        {
+            id: `${item.id}.image.${origin}`,
+            animation: 'move',
+            resize: 'clip'
+        }
+    ];
+}
+
+export default RecipeScreen;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: 'black',
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        marginTop: 5,
+        marginBottom: 10
+    },
+    image: {
+        width: '100%',
+        height: 180,
+        resizeMode: 'cover',
+        borderRadius: 15
+    },
+    detailsHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        width: '100%',
+        paddingHorizontal: 15,
+        paddingTop: 20,
+        paddingBottom: 15
+    },
+    youtube: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    title: {
+        //fontFamily: 'AlefBold',
+        fontSize: 22,
+        color: 'white',
+        flexShrink: 1,
+        marginRight: 10
+    },
+    text: {
+        color: 'black'
+    },
+    detailsContainer: {
+        flex: 1,
+        alignItems: 'flex-start'
+    },
+    details: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        width: '100%',
+        marginBottom: 15
+    },
+    ingredientsAndDirections: {
+        width: width
+    },
+    wrapper: {
+        width: width,
+        paddingHorizontal: 15
+    },
+    wrapperHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 5
+    },
+    wrapperTitle: {
+        //fontFamily: 'AlefBold',
+        fontSize: 20,
+        color: 'white'
+    },
+    wrapperNote: {
+        //fontFamily: 'Alef',
+        fontSize: 10,
+        color: 'white'
+    },
+    seperator: {
+        width: 1,
+        height: '60%',
+        borderRadius: 0.5,
+        backgroundColor: primary,
+        alignSelf: 'center',
+        marginHorizontal: 20
+    },
+});
