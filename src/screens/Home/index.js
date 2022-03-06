@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { BackHandler, StyleSheet, StatusBar, Platform, View, Button, Text } from 'react-native';
 import { useSelector } from 'react-redux';
+import { AnimatedFlatList } from '../../components';
 
 // firebase
 import { signOut } from 'firebase/auth';
@@ -44,13 +45,10 @@ const HomeScreen = ({ navigation }) => {
             <Button title='התנתק' onPress={() => onSignOut()} />
             <Button title='הוסף' onPress={() => navigation.navigate('Insertion')} />
             <Button title='הדפס' onPress={() => getData()} />
-            <View>
-                {recipes.map((recipe) => {
-                    return (
-                        <Text key={recipe.id}>{recipe.name}</Text>
-                    )
-                })}
-            </View>
+            <AnimatedFlatList
+                recipes={recipes}
+                origin={'Home'}
+            />
         </View>
     )
 }

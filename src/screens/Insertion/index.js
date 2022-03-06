@@ -396,11 +396,11 @@ const styles = StyleSheet.create({
         paddingVertical: 5
     },
     label: {
-        // fontFamily: 'Alef',
+        // // fontFamily: 'Alef',
         color: 'white'
     },
     textInput: {
-        // fontFamily: 'Alef',
+        // // fontFamily: 'Alef',
         fontSize: 16,
         color: 'white',
         textAlign: 'right',
@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     text: {
-        // fontFamily: 'AlefBold',
+        // // fontFamily: 'AlefBold',
         color: 'white',
         fontSize: 17,
         letterSpacing: 1.2
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
         elevation: 1
     },
     title: {
-        // fontFamily: 'AlefBold',
+        // // fontFamily: 'AlefBold',
         fontSize: 20,
         color: 'white',
         marginBottom: 5
