@@ -9,22 +9,33 @@ import { updateFavorite } from '../../redux/actions/recipes';
 import { Ingredients, Directions, Detail } from '../../components';
 import { background, primary } from '../../utils/palette';
 
+// firebase
+import { doc, updateDoc } from 'firebase/firestore/lite';
+import { db } from '../../utils/firebase';
+
 const DURATION = 200;
 const { width } = Dimensions.get('window');
 
 const RecipeScreen = ({ route, navigation }) => {
     const { item, origin } = route.params;
-    // console.log(item)
     const recipes = useSelector(state => state.recipes);
     const dispatch = useDispatch();
     const [favorite, setFavorite] = useState(item.favorite);
 
-    const handleFavoriteCahnge = (id, favorite) => {
-        setFavorite(favorite);
-        const index = recipes.findIndex(recipes => recipes.id === id);
-        const updatedRecipes = update(recipes, { [index]: { $merge: { favorite: favorite } } });
-        //setRecipesAtStorage(JSON.stringify(updatedRecipes)); // Update AsyncStorage
-        dispatch(updateFavorite(index, favorite)); // Update store
+    const handleFavoriteCahnge = async (id, favorite) => {
+        const recipeRef = doc(db, "recipes", id);
+        try {
+            // Update document on Firestore
+            await updateDoc(recipeRef, { favorite: favorite });
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+        finally {
+            setFavorite(favorite);
+            const index = recipes.findIndex(recipes => recipes.id === id);
+            dispatch(updateFavorite(index, favorite)); // Update store
+        }
     }
 
     return (
