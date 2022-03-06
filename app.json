@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "cookEat",
+    "slug": "cookEat",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
