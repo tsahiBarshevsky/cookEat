@@ -44,7 +44,6 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.container}>
             <Button title='התנתק' onPress={() => onSignOut()} />
             <Button title='הוסף' onPress={() => navigation.navigate('Insertion')} />
-            <Button title='הדפס' onPress={() => getData()} />
             <AnimatedFlatList
                 recipes={recipes}
                 origin={'Home'}

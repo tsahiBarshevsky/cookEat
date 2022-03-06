@@ -1,14 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Image, ToastAndroid, Dimensions } from 'react-native';
 import { SharedElement } from 'react-navigation-shared-element';
 import { useNavigation } from '@react-navigation/native';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useDispatch, useSelector } from 'react-redux';
-import update from 'immutability-helper';
-import { Entypo, MaterialCommunityIcons, EvilIcons } from '@expo/vector-icons';
+import { Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 import Modal from "react-native-modal";
 import { removeRecipe } from '../../redux/actions/recipes';
 import { background, primary, secondary } from '../../utils/palette';
+
+// firebase
+import { doc, deleteDoc } from 'firebase/firestore/lite';
+import { db } from '../../utils/firebase';
 
 const DURATION = 150;
 const { width } = Dimensions.get('window');
@@ -29,16 +32,21 @@ const RecipeCard = ({ item, origin }) => {
         }, DURATION + 10);
     }
 
-    const onRemoveRecipe = () => {
+    const onRemoveRecipe = async () => {
         const name = item.name;
-        const index = recipes.findIndex(recipes => recipes.id === item.id);
-        const updatedRecipes = update(recipes, { $splice: [[index, 1]] });
-        setRecipesAtStorage(JSON.stringify(updatedRecipes)); // Update AsyncStorage
-        dispatch(removeRecipe(index)); // Update store
-        setModalVisible(false);
-        setTimeout(() => {
-            ToastAndroid.show(`${name} נמחק בהצלחה`, ToastAndroid.LONG);
-        }, DURATION);
+        const index = recipes.findIndex(recipe => recipe.id === item.id);
+        try {
+            await deleteDoc(doc(db, "recipes", item.id));
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+        finally {
+            dispatch(removeRecipe(index)); // Update store
+            setTimeout(() => {
+                ToastAndroid.show(`${name} נמחק בהצלחה`, ToastAndroid.LONG);
+            }, DURATION);
+        }
     }
 
     const onOpenModal = () => {
@@ -47,6 +55,11 @@ const RecipeCard = ({ item, origin }) => {
             setModalVisible(true);
         }, DURATION + 50);
     }
+
+    // useEffect(() => {
+    //     isMountedRef.current = true;
+    //     return () => isMountedRef.current = false;
+    // }, [onRemoveRecipe]);
 
     return (
         <View>
