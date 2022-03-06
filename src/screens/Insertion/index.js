@@ -5,8 +5,7 @@ import uuid from 'react-native-uuid';
 import RadioForm from 'react-native-simple-radio-button';
 import { AntDesign } from '@expo/vector-icons';
 import update from 'immutability-helper';
-// import { addNewRecipe } from '../../redux/actions/recipes';
-// import { getRecipesFromStorage, setRecipesAtStorage } from '../../utils/AsyncStorageHandler';
+import { addNewRecipe } from '../../redux/actions/recipes';
 import { background, primary, secondary, placeholder } from '../../utils/palette';
 
 // firebase
@@ -22,7 +21,7 @@ const InsertionScreen = ({ navigation }) => {
     const [ingredients, setIngredients] = useState([{ key: uuid.v4() }]);
     const [directions, setDirections] = useState([{}]);
     const [formKey, setFormKey] = useState(0);
-    //const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
     // References for next textInput
     const nameRef = useRef(null);
@@ -112,8 +111,16 @@ const InsertionScreen = ({ navigation }) => {
             favorite: false,
             image: 'https://images.pexels.com/photos/1556688/pexels-photo-1556688.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260'
         };
-        await setDoc(doc(db, 'recipes', newRecipe.id), newRecipe);
-        navigation.navigate('Home');
+        try {
+            await setDoc(doc(db, 'recipes', newRecipe.id), newRecipe); // Add new doc
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+        finally {
+            dispatch(addNewRecipe(newRecipe)); // Update store
+            navigation.navigate('Home');
+        }
     }
 
     useEffect(() => {

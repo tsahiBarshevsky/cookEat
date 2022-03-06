@@ -20,7 +20,7 @@ const RegistrationScreen = ({ navigation }) => {
     useEffect(() => {
         const unsubscribe = authentication.onAuthStateChanged((user) => {
             if (user)
-                navigation.replace('Home');
+                navigation.replace('Splash');
         });
         return unsubscribe;
     }, []);

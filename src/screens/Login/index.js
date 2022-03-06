@@ -9,14 +9,14 @@ const LoginScreen = ({ navigation }) => {
 
     const onSignIn = () => {
         signInWithEmailAndPassword(authentication, email, password)
-            .then(() => navigation.replace('Home'))
+            .then(() => navigation.replace('Splash'))
             .catch((error) => console.log(error.message));
     }
 
     useEffect(() => {
         const unsubscribe = authentication.onAuthStateChanged((user) => {
             if (user)
-                navigation.replace('Home');
+                navigation.replace('Splash');
         });
         return unsubscribe;
     }, []);

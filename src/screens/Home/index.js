@@ -1,22 +1,17 @@
 import React, { useEffect } from 'react';
-import { BackHandler, StyleSheet, StatusBar, Platform, View, Button } from 'react-native';
+import { BackHandler, StyleSheet, StatusBar, Platform, View, Button, Text } from 'react-native';
+import { useSelector } from 'react-redux';
 
 // firebase
 import { signOut } from 'firebase/auth';
-import { collection, getDocs } from 'firebase/firestore/lite';
-import { authentication, db } from '../../utils/firebase';
+import { authentication } from '../../utils/firebase';
 
 const HomeScreen = ({ navigation }) => {
+    const recipes = useSelector(state => state.recipes);
+
     const onSignOut = () => {
         signOut(authentication);
         navigation.replace('Login');
-    }
-
-    const getData = async () => {
-        const recipesCol = collection(db, 'recipes');
-        const recipeSnapshot = await getDocs(recipesCol);
-        const recipesList = recipeSnapshot.docs.map(doc => doc.data());
-        console.log(recipesList);
     }
 
     const handleBackButtonClick = () => {
@@ -49,6 +44,13 @@ const HomeScreen = ({ navigation }) => {
             <Button title='התנתק' onPress={() => onSignOut()} />
             <Button title='הוסף' onPress={() => navigation.navigate('Insertion')} />
             <Button title='הדפס' onPress={() => getData()} />
+            <View>
+                {recipes.map((recipe) => {
+                    return (
+                        <Text key={recipe.id}>{recipe.name}</Text>
+                    )
+                })}
+            </View>
         </View>
     )
 }

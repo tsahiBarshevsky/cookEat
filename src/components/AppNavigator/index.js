@@ -7,7 +7,8 @@ import {
     HomeScreen,
     InsertionScreen,
     LoginScreen,
-    RegistrationScreen
+    RegistrationScreen,
+    SplashScreen
 } from '../../screens';
 
 const Stack = createSharedElementStackNavigator();
@@ -24,6 +25,11 @@ const AppNavigator = () => {
                 <Stack.Screen
                     name='Login'
                     component={LoginScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name='Splash'
+                    component={SplashScreen}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
