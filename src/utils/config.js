@@ -1,5 +1,17 @@
-import { API_URL } from "@env";
+import {
+    API_KEY,
+    AUTH_DOMAIN,
+    PROJECT_ID,
+    STORAGE_BUCKET,
+    MESSANING_SENDER_ID,
+    APP_ID
+} from "@env";
 
 export default {
-    API_URL
+    API_KEY,
+    AUTH_DOMAIN,
+    PROJECT_ID,
+    STORAGE_BUCKET,
+    MESSANING_SENDER_ID,
+    APP_ID
 };
