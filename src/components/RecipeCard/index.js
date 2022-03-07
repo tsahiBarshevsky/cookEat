@@ -230,14 +230,16 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginTop: 10,
-        marginBottom: 5
+        marginBottom: 15
     },
     category: {
         backgroundColor: secondary,
         paddingVertical: 5,
         paddingHorizontal: 10,
         borderRadius: 10,
-        marginRight: 10
+        elevation: 2,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        borderWidth: 0.5
     },
     categoryText: {
         // fontFamily: 'Alef',

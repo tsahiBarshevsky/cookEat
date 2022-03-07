@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import * as Animatable from 'react-native-animatable';
 import { updateFavorite } from '../../redux/actions/recipes';
 import { Ingredients, Directions, Detail } from '../../components';
-import { background, primary } from '../../utils/palette';
+import { background, fadedBackground, primary } from '../../utils/palette';
 
 // React Native component
 import {
@@ -18,7 +18,8 @@ import {
     Linking,
     Dimensions,
     SafeAreaView,
-    ScrollView
+    ScrollView,
+    Pressable
 } from 'react-native';
 
 // firebase
@@ -67,7 +68,7 @@ const RecipeScreen = ({ route, navigation }) => {
                     style={[styles.floatingButton, styles.close]}
                 >
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Ionicons name="chevron-back" size={25} color="black" />
+                        <Ionicons name="chevron-back" size={25} color="white" />
                     </TouchableOpacity>
                 </Animatable.View>
                 <Animatable.View
@@ -77,22 +78,17 @@ const RecipeScreen = ({ route, navigation }) => {
                 >
                     <TouchableOpacity onPress={() => handleFavoriteCahnge(item.id, !favorite)}>
                         {favorite ?
-                            <FontAwesome name="bookmark" size={22} color="black" />
+                            <FontAwesome name="bookmark" size={22} color="white" />
                             :
-                            <FontAwesome name="bookmark-o" size={22} color="black" />
+                            <FontAwesome name="bookmark-o" size={22} color="white" />
                         }
                     </TouchableOpacity>
                 </Animatable.View>
             </View>
-            <SharedElement id={`${item.id}.details.${origin}`} style={{ flex: 1 }} >
+            <SharedElement id={`${item.id}.details.${origin}`} style={{ flex: 1 }}>
                 <View style={styles.recipe}>
                     <View style={{ alignItems: 'center', padding: 15 }}>
-                        <Animatable.View
-                            animation='tada'
-                            delay={DURATION}
-                        >
-                            <Text>{item.name}</Text>
-                        </Animatable.View>
+                        <Text>{item.name}</Text>
                     </View>
                     <View style={styles.details}>
                         <Animatable.View
@@ -271,11 +267,6 @@ RecipeScreen.sharedElements = (route) => {
             id: `${item.id}.details.${origin}`,
             animation: 'fade',
             resize: 'clip'
-        },
-        {
-            id: `${item.id}.button.${origin}`,
-            animation: 'fade',
-            resize: 'clip'
         }
     ];
 }
@@ -285,13 +276,13 @@ export default RecipeScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'black',
+        backgroundColor: background,
         // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
     recipe: {
         flex: 1,
-        marginTop: -40,
-        backgroundColor: 'lightgrey',
+        marginTop: -30,
+        backgroundColor: background,
         borderTopRightRadius: 40,
         borderTopLeftRadius: 40
     },
@@ -300,10 +291,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         top: StatusBar.currentHeight + 5,
-        backgroundColor: 'lightgrey',
-        width: 30,
-        height: 30,
-        borderRadius: 10
+        backgroundColor: fadedBackground,
+        width: 35,
+        height: 35,
+        borderRadius: 13,
     },
     close: {
         right: 15
