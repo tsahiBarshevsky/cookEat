@@ -88,7 +88,9 @@ const RecipeCard = ({ item, origin }) => {
                                     <MaterialCommunityIcons name="dots-vertical" size={24} color="white" />
                                 </TouchableOpacity>
                             </View>
-                            <Text style={styles.title}>{item.name}</Text>
+                            <View style={{ alignItems: 'flex-start' }}>
+                                <Text adjustsFontSizeToFit style={styles.title}>{item.name}</Text>
+                            </View>
                         </View>
                         :
                         <View style={[styles.details, { alignItems: 'flex-start' }]}>

@@ -1,13 +1,25 @@
 import React, { useState } from 'react';
-import { StyleSheet, StatusBar, Text, View, Image, TouchableOpacity, Linking, Dimensions, SafeAreaView, ScrollView } from 'react-native';
 import { SharedElement } from 'react-navigation-shared-element';
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import * as Animatable from 'react-native-animatable';
-import update from 'immutability-helper';
 import { updateFavorite } from '../../redux/actions/recipes';
 import { Ingredients, Directions, Detail } from '../../components';
 import { background, primary } from '../../utils/palette';
+
+// React Native component
+import {
+    StyleSheet,
+    StatusBar,
+    Text,
+    View,
+    Image,
+    TouchableOpacity,
+    Linking,
+    Dimensions,
+    SafeAreaView,
+    ScrollView
+} from 'react-native';
 
 // firebase
 import { doc, updateDoc } from 'firebase/firestore/lite';
@@ -40,7 +52,111 @@ const RecipeScreen = ({ route, navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
+            <StatusBar translucent backgroundColor={'transparent'} />
+            <View style={{ height: '40%' }}>
+                <SharedElement id={`${item.id}.image.${origin}`}>
+                    <Image
+                        source={{ uri: item.image.url }}
+                        resizeMode='cover'
+                        style={{ height: '100%', width: '100%', zIndex: 1 }}
+                    />
+                </SharedElement>
+                <Animatable.View
+                    animation='zoomIn'
+                    delay={250}
+                    style={[styles.floatingButton, styles.close]}
+                >
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <Ionicons name="chevron-back" size={25} color="black" />
+                    </TouchableOpacity>
+                </Animatable.View>
+                <Animatable.View
+                    animation='zoomIn'
+                    delay={250}
+                    style={[styles.floatingButton, styles.favorite]}
+                >
+                    <TouchableOpacity onPress={() => handleFavoriteCahnge(item.id, !favorite)}>
+                        {favorite ?
+                            <FontAwesome name="bookmark" size={22} color="black" />
+                            :
+                            <FontAwesome name="bookmark-o" size={22} color="black" />
+                        }
+                    </TouchableOpacity>
+                </Animatable.View>
+            </View>
+            <SharedElement id={`${item.id}.details.${origin}`} style={{ flex: 1 }} >
+                <View style={styles.recipe}>
+                    <View style={{ alignItems: 'center', padding: 15 }}>
+                        <Animatable.View
+                            animation='tada'
+                            delay={DURATION}
+                        >
+                            <Text>{item.name}</Text>
+                        </Animatable.View>
+                    </View>
+                    <View style={styles.details}>
+                        <Animatable.View
+                            animation='bounceIn'
+                            delay={DURATION}
+                        >
+                            <Detail
+                                type={'time'}
+                                value={`${item.time.value} ${item.time.unit}`}
+                            />
+                        </Animatable.View>
+                        <View style={styles.seperator} />
+                        <Animatable.View
+                            animation='bounceIn'
+                            delay={DURATION + 200}
+                        >
+                            <Detail
+                                type={'quantity'}
+                                value={`${item.quantity} מנות`}
+                            />
+                        </Animatable.View>
+                        <View style={styles.seperator} />
+                        <Animatable.View
+                            animation='bounceIn'
+                            delay={DURATION + 400}
+                        >
+                            <Detail
+                                type={'category'}
+                                value={item.category}
+                            />
+                        </Animatable.View>
+                    </View>
+                    <Animatable.View
+                        animation='fadeInUp'
+                        delay={DURATION}
+                        style={{ height: '100%', flex: 1 }}
+                    >
+                        <ScrollView
+                            horizontal
+                            decelerationRate="fast"
+                            snapToInterval={width}
+                            showsHorizontalScrollIndicator={false}
+                            style={styles.ingredientsAndDirections}
+                            overScrollMode="never"
+                        >
+                            <View style={styles.wrapper}>
+                                <View style={styles.wrapperHeader}>
+                                    <Text style={styles.wrapperTitle}>מרכיבים</Text>
+                                    <Text style={styles.wrapperNote}>({item.ingredients.length} פריטים)</Text>
+                                </View>
+                                <Ingredients ingredients={item.ingredients} />
+                            </View>
+                            <View style={styles.wrapper}>
+                                <View style={styles.wrapperHeader}>
+                                    <Text style={styles.wrapperTitle}>אופן ההכנה</Text>
+                                    <Text style={styles.wrapperNote}>({item.directions.length} פריטים)</Text>
+                                </View>
+                                <Directions directions={item.directions} />
+                            </View>
+                        </ScrollView>
+                    </Animatable.View>
+                </View>
+            </SharedElement>
+            {/* <View style={styles.header}>
                 <Animatable.View
                     animation='zoomIn'
                     delay={250}
@@ -138,7 +254,7 @@ const RecipeScreen = ({ route, navigation }) => {
                         </View>
                     </ScrollView>
                 </Animatable.View>
-            </View>
+            </View> */}
         </SafeAreaView>
     )
 }
@@ -150,6 +266,16 @@ RecipeScreen.sharedElements = (route) => {
             id: `${item.id}.image.${origin}`,
             animation: 'move',
             resize: 'clip'
+        },
+        {
+            id: `${item.id}.details.${origin}`,
+            animation: 'fade',
+            resize: 'clip'
+        },
+        {
+            id: `${item.id}.button.${origin}`,
+            animation: 'fade',
+            resize: 'clip'
         }
     ];
 }
@@ -160,7 +286,30 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'black',
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+        // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    },
+    recipe: {
+        flex: 1,
+        marginTop: -40,
+        backgroundColor: 'lightgrey',
+        borderTopRightRadius: 40,
+        borderTopLeftRadius: 40
+    },
+    floatingButton: {
+        position: 'absolute',
+        justifyContent: 'center',
+        alignItems: 'center',
+        top: StatusBar.currentHeight + 5,
+        backgroundColor: 'lightgrey',
+        width: 30,
+        height: 30,
+        borderRadius: 10
+    },
+    close: {
+        right: 15
+    },
+    favorite: {
+        left: 15
     },
     header: {
         flexDirection: 'row',

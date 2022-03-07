@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import { BackHandler, StyleSheet, StatusBar, Platform, View, Button, Text } from 'react-native';
+import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useSelector } from 'react-redux';
 import { AnimatedFlatList } from '../../components';
+import { background } from '../../utils/palette';
 
 // firebase
 import { signOut } from 'firebase/auth';
@@ -42,6 +44,7 @@ const HomeScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            <ExpoStatusBar style='dark' />
             <Button title='התנתק' onPress={() => onSignOut()} />
             <Button title='הוסף' onPress={() => navigation.navigate('Insertion')} />
             <AnimatedFlatList
@@ -57,6 +60,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+        backgroundColor: background
     }
 });
