@@ -4,6 +4,7 @@ import { createSharedElementStackNavigator } from 'react-navigation-shared-eleme
 
 // App screens
 import {
+    EditingScreen,
     HomeScreen,
     InsertionScreen,
     LoginScreen,
@@ -49,6 +50,11 @@ const AppNavigator = () => {
                 <Stack.Screen
                     name='Insertion'
                     component={InsertionScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name='Editing'
+                    component={EditingScreen}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
