@@ -33,6 +33,7 @@ const RecipeCard = ({ item, origin }) => {
     }
 
     const onRemoveRecipe = async () => {
+
         const name = item.name;
         const index = recipes.findIndex(recipe => recipe.id === item.id);
         try {
@@ -43,6 +44,12 @@ const RecipeCard = ({ item, origin }) => {
         }
         finally {
             dispatch(removeRecipe(index)); // Update store
+            // Delete image from cloudinary
+            if (item.image.public_id)
+                fetch(`https://cloudinary-management.herokuapp.com/delete-image?public_id=${item.image.public_id}`)
+                    .then((res) => res.json())
+                    .then((res) => console.log(res))
+                    .catch((error) => console.log("error: ", error.message));
             setTimeout(() => {
                 ToastAndroid.show(`${name} נמחק בהצלחה`, ToastAndroid.LONG);
             }, DURATION);
@@ -56,11 +63,6 @@ const RecipeCard = ({ item, origin }) => {
         }, DURATION + 50);
     }
 
-    // useEffect(() => {
-    //     isMountedRef.current = true;
-    //     return () => isMountedRef.current = false;
-    // }, [onRemoveRecipe]);
-
     return (
         <View>
             <TouchableOpacity
@@ -70,7 +72,7 @@ const RecipeCard = ({ item, origin }) => {
                 <View style={styles.container}>
                     <View>
                         <SharedElement id={`${item.id}.image.${origin}`}>
-                            <Image source={{ uri: item.image }} style={styles.image} />
+                            <Image source={{ uri: item.image.url }} style={styles.image} />
                         </SharedElement>
                     </View>
                     {origin !== 'categories' ?

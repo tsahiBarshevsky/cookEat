@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SafeAreaView, StatusBar, ScrollView, TouchableOpacity, StyleSheet, Text, Platform, TextInput, View, KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView, StatusBar, ScrollView, TouchableOpacity, StyleSheet, Image, Text, Platform, TextInput, View, KeyboardAvoidingView } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useDispatch } from 'react-redux';
 import uuid from 'react-native-uuid';
 import RadioForm from 'react-native-simple-radio-button';
 import { AntDesign } from '@expo/vector-icons';
 import update from 'immutability-helper';
+import { UIActivityIndicator } from 'react-native-indicators';
 import { addNewRecipe } from '../../redux/actions/recipes';
 import { background, primary, secondary, placeholder } from '../../utils/palette';
+import config from '../../utils/config';
 
 // firebase
 import { doc, setDoc } from 'firebase/firestore/lite';
@@ -21,6 +24,9 @@ const InsertionScreen = ({ navigation }) => {
     const [ingredients, setIngredients] = useState([{ key: uuid.v4() }]);
     const [directions, setDirections] = useState([{}]);
     const [formKey, setFormKey] = useState(0);
+    const [image, setImage] = useState(null);
+    const [cloudnirayLink, setCloudnirayLink] = useState('');
+    const [disabled, setDisabled] = useState(false);
     const dispatch = useDispatch();
 
     // References for next textInput
@@ -94,7 +100,56 @@ const InsertionScreen = ({ navigation }) => {
         setYoutube('');
     }
 
+    const handleUploadImage = (image) => {
+        const data = new FormData();
+        data.append('file', image);
+        data.append('upload_preset', 'cookEat');
+        data.append('cloud_name', 'ddofzlgdu');
+        fetch('https://api.cloudinary.com/v1_1/ddofzlgdu/image/upload', {
+            method: 'POST',
+            body: data
+        })
+            .then(res => res.json())
+            .then(data => {
+                // console.log(data);
+                setCloudnirayLink(data);
+            });
+    }
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            //aspect: [16, 9],
+            quality: 1,
+        });
+
+        if (!result.cancelled) {
+            setImage(result.uri);
+            // const newFile = {
+            //     uri: result.uri,
+            //     type: `test/${result.uri.split(".")[1]}`,
+            //     name: `test.${result.uri.split(".")[1]}`
+            // }
+            // handleUploadImage(newFile);
+        }
+    }
+
+    const handleAddDocument = async (newRecipe) => {
+        try {
+            await setDoc(doc(db, 'recipes', newRecipe.id), newRecipe); // Add new doc
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+        finally {
+            dispatch(addNewRecipe(newRecipe)); // Update store
+            navigation.navigate('Home');
+        }
+    }
+
     const onAddNewRecipe = async () => {
+        setDisabled(true);
         const newRecipe = {
             id: uuid.v4(),
             owner: authentication.currentUser.email,
@@ -108,18 +163,39 @@ const InsertionScreen = ({ navigation }) => {
             },
             ingredients: ingredients,
             directions: directions,
-            favorite: false,
-            image: 'https://images.pexels.com/photos/1556688/pexels-photo-1556688.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260'
+            favorite: false
         };
-        try {
-            await setDoc(doc(db, 'recipes', newRecipe.id), newRecipe); // Add new doc
+        // Check if the user has uploaded an image
+        if (image) {
+            const newFile = {
+                uri: image,
+                type: `test/${image.split(".")[1]}`,
+                name: `test.${image.split(".")[1]}`
+            }
+            const data = new FormData();
+            data.append('file', newFile);
+            data.append('upload_preset', 'cookEat');
+            data.append('cloud_name', config.CLOUDINARY_KEY);
+            fetch(`https://api.cloudinary.com/v1_1/${config.CLOUDINARY_KEY}/image/upload`, {
+                method: 'POST',
+                body: data
+            })
+                .then(res => res.json())
+                .then(data => {
+                    newRecipe.image = {
+                        url: data.url,
+                        public_id: data.public_id
+                    };
+                    handleAddDocument(newRecipe);
+                })
+                .catch((error) => console.log("error on upload image:", error.message));
         }
-        catch (error) {
-            console.log(error.message);
-        }
-        finally {
-            dispatch(addNewRecipe(newRecipe)); // Update store
-            navigation.navigate('Home');
+        else {
+            newRecipe.image = {
+                url: 'https://images.pexels.com/photos/1556688/pexels-photo-1556688.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+                public_id: null
+            };
+            handleAddDocument(newRecipe);
         }
     }
 
@@ -138,6 +214,10 @@ const InsertionScreen = ({ navigation }) => {
                     enabled
                     behavior={Platform.OS === 'ios' ? 'padding' : null}
                 >
+                    <TouchableOpacity onPress={() => pickImage()}>
+                        <Text>בחר תמונה</Text>
+                    </TouchableOpacity>
+                    {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
                     <View style={styles.textInputWrapper}>
                         <Text style={styles.label}>שם המתכון</Text>
                         <TextInput
@@ -362,8 +442,13 @@ const InsertionScreen = ({ navigation }) => {
                         onPress={onAddNewRecipe}
                         style={styles.button}
                         activeOpacity={0.8}
+                        disabled={disabled}
                     >
-                        <Text style={styles.text}>הוספה</Text>
+                        {!disabled ?
+                            <Text style={styles.text}>הוספה</Text>
+                            :
+                            <UIActivityIndicator size={25} count={12} color='white' />
+                        }
                     </TouchableOpacity>
                 </KeyboardAvoidingView>
             </ScrollView>

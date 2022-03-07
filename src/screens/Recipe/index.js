@@ -66,7 +66,7 @@ const RecipeScreen = ({ route, navigation }) => {
             </View>
             <View style={{ marginHorizontal: 15 }}>
                 <SharedElement id={`${item.id}.image.${origin}`}>
-                    <Image source={{ uri: item.image }} style={styles.image} />
+                    <Image source={{ uri: item.image.url }} style={styles.image} />
                 </SharedElement>
             </View>
             <View style={styles.detailsContainer}>
