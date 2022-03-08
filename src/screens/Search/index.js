@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Platform, StatusBar, Text, SafeAreaView, TextInput, TouchableOpacity, View, KeyboardAvoidingView } from 'react-native';
-import { EvilIcons, Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Platform, StatusBar, Text, SafeAreaView, TextInput, TouchableOpacity, View, FlatList } from 'react-native';
+import { EvilIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import { AnimatedFlatList } from '../../components';
 import { background, primary, placeholder } from '../../utils/palette';
 
-const SearchScreen = ({ navigation, route }) => {
+const SearchScreen = ({ route }) => {
     const { size } = route.params;
     const [keyword, setKeyword] = useState('');
     const [isSearched, setIsSearched] = useState(false);
@@ -20,12 +20,19 @@ const SearchScreen = ({ navigation, route }) => {
         keywordRef.current?.focus();
     }
 
+    const handleTermSelect = (term) => {
+        setKeyword(term);
+        setIsSearched(true);
+    }
+
     useEffect(() => {
-        keywordRef.current?.focus();
+        //keywordRef.current?.focus();
     }, []);
 
+    const searchTerms = ['חיפוש1', 'חיפוש2', 'כמה מרכיבים'];
+
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <View style={styles.searchBar}>
                 <EvilIcons name="search" size={24} color="white" />
                 <TextInput
@@ -50,11 +57,11 @@ const SearchScreen = ({ navigation, route }) => {
                     </TouchableOpacity>
                 }
             </View>
-            {isSearched &&
+            {isSearched ?
                 <View style={{ flex: 1 }}>
                     {result.length > 0 ?
                         <View style={{ flex: 1 }}>
-                            <View style={{ paddingHorizontal: 15, marginTop: 10 }}>
+                            <View style={styles.wrapper}>
                                 <Text style={styles.text}>
                                     {result.length > 1 ?
                                         `${result.length} מתכונים נמצאו`
@@ -74,8 +81,32 @@ const SearchScreen = ({ navigation, route }) => {
                         </View>
                     }
                 </View>
+                :
+                <View style={styles.wrapper}>
+                    <Text style={styles.text}>חיפושים אחרונים</Text>
+                    <FlatList
+                        data={searchTerms}
+                        style={{ paddingVertical: 10 }}
+                        keyExtractor={(item) => item}
+                        ItemSeparatorComponent={() => <View style={{ paddingVertical: 5 }} />}
+                        renderItem={({ item }) => {
+                            return (
+                                <TouchableOpacity
+                                    onPress={() => handleTermSelect(item)}
+                                    style={styles.searchBox}
+                                    activeOpacity={0.5}
+                                >
+                                    <View style={styles.searchBoxIcon}>
+                                        <MaterialIcons name="history" size={20} color="#FFFFFF80" />
+                                    </View>
+                                    <Text style={styles.text}>{item}</Text>
+                                </TouchableOpacity>
+                            )
+                        }}
+                    />
+                </View>
             }
-        </View>
+        </SafeAreaView>
     )
 }
 
@@ -124,5 +155,22 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 15
+    },
+    wrapper: {
+        paddingHorizontal: 15,
+        marginTop: 10
+    },
+    searchBox: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    searchBoxIcon: {
+        width: 35,
+        height: 35,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: primary,
+        borderRadius: 17.5,
+        marginRight: 10
     }
 });
