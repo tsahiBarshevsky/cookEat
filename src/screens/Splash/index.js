@@ -11,12 +11,21 @@ import { authentication, db } from '../../utils/firebase';
 const SplashScreen = ({ navigation }) => {
     const dispatch = useDispatch();
 
+    const sortByCreateDate = (a, b) => {
+        if (a.created > b.created)
+            return 1;
+        else
+            if (b.created > a.created)
+                return -1;
+        return 0;
+    }
+
     const fetchRecipes = async () => {
         const recipesRef = collection(db, "recipes");
         const q = query(recipesRef, where("owner", "==", authentication.currentUser.email));
         try {
             const querySnapshot = await getDocs(q);
-            dispatch({ type: 'SET_RECIPES', recipes: querySnapshot.docs.map((doc) => doc.data()) });
+            dispatch({ type: 'SET_RECIPES', recipes: querySnapshot.docs.map((doc) => doc.data()).sort(sortByCreateDate) });
         }
         catch (error) {
             console.log(error.message);

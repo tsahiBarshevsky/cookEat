@@ -153,6 +153,7 @@ const InsertionScreen = ({ navigation }) => {
         const newRecipe = {
             id: uuid.v4(),
             owner: authentication.currentUser.email,
+            created: new Date(),
             name: name,
             quantity: quantity,
             category: category,
