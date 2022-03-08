@@ -1,21 +1,12 @@
 import React, { useEffect } from 'react';
-import { BackHandler, StyleSheet, StatusBar, Platform, View, Button, Text } from 'react-native';
+import { BackHandler, StyleSheet, StatusBar, Platform, View } from 'react-native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useSelector } from 'react-redux';
 import { ActionsBar, AnimatedFlatList } from '../../components';
 import { background } from '../../utils/palette';
 
-// firebase
-import { signOut } from 'firebase/auth';
-import { authentication } from '../../utils/firebase';
-
 const HomeScreen = ({ navigation }) => {
     const recipes = useSelector(state => state.recipes);
-
-    const onSignOut = () => {
-        signOut(authentication);
-        navigation.replace('Login');
-    }
 
     const handleBackButtonClick = () => {
         const routes = navigation.getState()?.routes;
@@ -45,8 +36,6 @@ const HomeScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <ExpoStatusBar style='light' />
-            {/* <Button title='התנתק' onPress={() => onSignOut()} />
-            <Button title='הוסף' onPress={() => navigation.navigate('Insertion')} /> */}
             <ActionsBar size={recipes.length} />
             <AnimatedFlatList
                 recipes={recipes}

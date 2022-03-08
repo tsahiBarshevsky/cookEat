@@ -119,7 +119,7 @@ const RecipeCard = ({ item, origin }) => {
                         backgroundColor: background
                     },
                     draggableIcon: {
-                        backgroundColor: 'white'
+                        backgroundColor: secondary
                     },
                     wrapper: {
                         backgroundColor: 'rgba(0, 0, 0, 0.7)'

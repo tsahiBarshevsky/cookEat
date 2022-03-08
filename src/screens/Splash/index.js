@@ -41,7 +41,7 @@ const SplashScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <BallIndicator size={30} count={8} color='black' />
+            <BallIndicator size={30} count={8} color='white' />
         </SafeAreaView>
     )
 }
