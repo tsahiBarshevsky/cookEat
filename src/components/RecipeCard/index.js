@@ -33,7 +33,6 @@ const RecipeCard = ({ item, origin }) => {
     }
 
     const onRemoveRecipe = async () => {
-
         const name = item.name;
         const index = recipes.findIndex(recipe => recipe.id === item.id);
         try {

@@ -8,6 +8,8 @@ const searchTermsReducer = (state = INITIAL_STATE, action) => {
             return action.searchTerms;
         case 'ADD_NEW_SEARCH_TERM':
             return update(state, { $push: [action.payload] });
+        case 'REMOVE_SEARCH_TERM':
+            return update(state, { $splice: [[action.payload, 1]] });
         default:
             return state;
     }

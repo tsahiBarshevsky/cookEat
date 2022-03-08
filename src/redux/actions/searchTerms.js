@@ -5,4 +5,11 @@ const addNewSearchTerm = (searchTerm) => {
     }
 };
 
-export { addNewSearchTerm };
+const removeSearchTerm = (index) => {
+    return {
+        type: 'REMOVE_SEARCH_TERM',
+        payload: index
+    }
+};
+
+export { addNewSearchTerm, removeSearchTerm };

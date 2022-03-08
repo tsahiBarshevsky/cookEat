@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import update from 'immutability-helper';
 import { AnimatedFlatList } from '../../components';
 import { background, primary, placeholder } from '../../utils/palette';
-import { addNewSearchTerm } from '../../redux/actions/searchTerms';
+import { addNewSearchTerm, removeSearchTerm } from '../../redux/actions/searchTerms';
 import { setRecentSearchTerms } from '../../utils/AsyncStorageHandler';
 
 const SearchScreen = ({ route }) => {
@@ -22,8 +22,8 @@ const SearchScreen = ({ route }) => {
         setIsSearched(true);
         // Check if keyword exists in search terms array
         if (!searchTerms.includes(key.trim())) {
-            const updated = update(searchTerms, { $push: [key] });
-            setRecentSearchTerms(JSON.stringify(updated)); // Update AsyncStorage
+            const updatedSearchTerms = update(searchTerms, { $push: [key] });
+            setRecentSearchTerms(JSON.stringify(updatedSearchTerms)); // Update AsyncStorage
             dispatch(addNewSearchTerm(key)); // Update store
         }
     }
@@ -31,6 +31,12 @@ const SearchScreen = ({ route }) => {
     const handleTermSelect = (term) => {
         setKeyword(term);
         setIsSearched(true);
+    }
+
+    const handleRemoveTerm = (index) => {
+        const updatedSearchTerms = update(searchTerms, { $splice: [[index, 1]] });
+        setRecentSearchTerms(JSON.stringify(updatedSearchTerms)); // Update AsyncStorage
+        dispatch(removeSearchTerm(index)); // Update store
     }
 
     const onResetSearch = () => {
@@ -109,10 +115,11 @@ const SearchScreen = ({ route }) => {
                                 contentContainerStyle={{ paddingBottom: 20 }}
                                 keyExtractor={(item) => item}
                                 ItemSeparatorComponent={() => <View style={{ paddingVertical: 5 }} />}
-                                renderItem={({ item }) => {
+                                renderItem={({ item, index }) => {
                                     return (
                                         <TouchableOpacity
                                             onPress={() => handleTermSelect(item)}
+                                            onLongPress={() => handleRemoveTerm(index)}
                                             style={styles.searchBox}
                                             activeOpacity={0.5}
                                         >
