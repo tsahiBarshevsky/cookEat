@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { StyleSheet, Platform, StatusBar, Text, SafeAreaView } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { BallIndicator } from 'react-native-indicators';
+import { getRecentSearchTerms } from '../../utils/AsyncStorageHandler';
 import { background } from '../../utils/palette';
 
 // firebase
@@ -20,12 +21,24 @@ const SplashScreen = ({ navigation }) => {
         return 0;
     }
 
-    const fetchRecipes = async () => {
+    const fetchData = async () => {
         const recipesRef = collection(db, "recipes");
         const q = query(recipesRef, where("owner", "==", authentication.currentUser.email));
         try {
             const querySnapshot = await getDocs(q);
-            dispatch({ type: 'SET_RECIPES', recipes: querySnapshot.docs.map((doc) => doc.data()).sort(sortByCreateDate) });
+            // Update store with recipes from Firestore
+            dispatch({
+                type: 'SET_RECIPES',
+                recipes: querySnapshot.docs.map((doc) => doc.data()).sort(sortByCreateDate)
+            });
+            // Update store with recent search terms from AsyncStorage
+            getRecentSearchTerms()
+                .then((res) => {
+                    dispatch({
+                        type: 'SET_SEARCH_TERMS',
+                        searchTerms: res
+                    })
+                });
         }
         catch (error) {
             console.log(error.message);
@@ -36,7 +49,7 @@ const SplashScreen = ({ navigation }) => {
     }
 
     useEffect(() => {
-        fetchRecipes();
+        fetchData();
     }, []);
 
     return (

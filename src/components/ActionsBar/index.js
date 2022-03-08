@@ -47,6 +47,7 @@ const ActionsBar = ({ size }) => {
             <TouchableOpacity
                 onPress={() => navigation.navigate("Search", { size })}
                 activeOpacity={1}
+                style={styles.searchButton}
             >
                 <Text style={styles.placeholder}>
                     חיפוש מבין {size} מתכונים...
@@ -112,7 +113,7 @@ const ActionsBar = ({ size }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </RBSheet >
+            </RBSheet>
         </View >
     )
 }
@@ -178,5 +179,11 @@ const styles = StyleSheet.create({
     },
     buttonHover: {
         backgroundColor: hover
+    },
+    searchButton: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%'
     }
 });
