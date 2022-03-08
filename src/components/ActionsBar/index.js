@@ -44,7 +44,10 @@ const ActionsBar = ({ size }) => {
             >
                 <Feather name="menu" size={24} color="rgba(255, 255, 255, 0.8)" />
             </TouchableOpacity>
-            <TouchableOpacity activeOpacity={1}>
+            <TouchableOpacity
+                onPress={() => navigation.navigate("Search", { size })}
+                activeOpacity={1}
+            >
                 <Text style={styles.placeholder}>
                     חיפוש מבין {size} מתכונים...
                 </Text>

@@ -10,6 +10,7 @@ import {
     LoginScreen,
     RecipeScreen,
     RegistrationScreen,
+    SearchScreen,
     SplashScreen
 } from '../../screens';
 
@@ -45,6 +46,11 @@ const AppNavigator = () => {
                 <Stack.Screen
                     name='Recipe'
                     component={RecipeScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name='Search'
+                    component={SearchScreen}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
