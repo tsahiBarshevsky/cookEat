@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { BackHandler, StyleSheet, StatusBar, Platform, View, Button, Text } from 'react-native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useSelector } from 'react-redux';
-import { AnimatedFlatList } from '../../components';
+import { ActionsBar, AnimatedFlatList } from '../../components';
 import { background } from '../../utils/palette';
 
 // firebase
@@ -44,9 +44,10 @@ const HomeScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <ExpoStatusBar style='dark' />
-            <Button title='התנתק' onPress={() => onSignOut()} />
-            <Button title='הוסף' onPress={() => navigation.navigate('Insertion')} />
+            <ExpoStatusBar style='light' />
+            {/* <Button title='התנתק' onPress={() => onSignOut()} />
+            <Button title='הוסף' onPress={() => navigation.navigate('Insertion')} /> */}
+            <ActionsBar size={recipes.length} />
             <AnimatedFlatList
                 recipes={recipes}
                 origin={'Home'}
