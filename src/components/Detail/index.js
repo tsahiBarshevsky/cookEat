@@ -6,11 +6,31 @@ const Detail = ({ value, type }) => {
     const renderIcon = () => {
         switch (type) {
             case 'time':
-                return <AntDesign name="clockcircleo" size={20} color="#FFFFFF" />;
+                return (
+                    <AntDesign
+                        style={styles.icon}
+                        name="clockcircleo"
+                        size={18}
+                        color="#FFFFFF"
+                    />
+                );
             case 'quantity':
-                return <MaterialCommunityIcons name="circle-double" size={20} color="#FFFFFF" />;
+                return (
+                    <MaterialCommunityIcons
+                        style={[styles.icon, styles.quantity]}
+                        name="circle-double"
+                        size={20}
+                        color="#FFFFFF"
+                    />
+                );
             case 'category':
-                return <FontAwesome name="cutlery" size={20} color="#FFFFFF" />;
+                return (
+                    <FontAwesome
+                        style={styles.icon}
+                        name="cutlery"
+                        size={18}
+                        color="#FFFFFF"
+                    />);
             default:
                 return null;
         }
@@ -32,11 +52,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     text: {
-        //fontFamily: 'AlefBold',
-        fontSize: 18,
+        fontSize: 17,
         color: 'white'
     },
     move: {
         transform: [{ translateY: 1 }]
+    },
+    icon: {
+        marginBottom: 2.5
+    },
+    quantity: {
+        marginTop: -2
     }
 });

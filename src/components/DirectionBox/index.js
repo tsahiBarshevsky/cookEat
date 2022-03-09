@@ -1,14 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { primary } from '../../utils/palette';
+import Dash from 'react-native-dash';
+// import DashedLine from 'react-native-dashed-line';
+import { background, primary } from '../../utils/palette';
 
-const DirectionBox = ({ index, value }) => {
+const DirectionBox = ({ index, value, size }) => {
+    const [height, setHeight] = useState(0);
+    const [firstRender, setFirstRender] = useState(true);
     return (
-        <View style={styles.container}>
-            <View style={styles.indexWrapper}>
-                <Text style={styles.index}>{index + 1}</Text>
+        <View style={styles.container} onLayout={(event) => {
+            if (firstRender) {
+                setFirstRender(false);
+                setHeight(event.nativeEvent.layout.height);
+            }
+        }}>
+            <View style={styles.stepWrapper}>
+                <View style={styles.circle} />
+                {index !== (size - 1) &&
+                    <Dash
+                        dashColor='white'
+                        style={{
+                            width: 1,
+                            height: height,
+                            flexDirection: 'column'
+                        }}
+                    />
+                }
             </View>
             <View style={styles.content}>
+                <Text style={[styles.text, styles.step]}>שלב {index + 1}</Text>
                 <Text style={styles.text}>{value}</Text>
             </View>
         </View>
@@ -19,19 +39,31 @@ export default DirectionBox;
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        flex: 1
     },
-    indexWrapper: {
+    stepWrapper: {
         alignItems: 'center',
-        height: 30,
-        width: 30,
-        borderRadius: 15,
-        backgroundColor: primary,
-        elevation: 1,
+        height: '100%',
         marginRight: 15
     },
+    circle: {
+        width: 15,
+        height: 15,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: 'white',
+    },
+    line: {
+        backgroundColor: 'white',
+        width: 1,
+        borderColor: 'white',
+        minHeight: '100%',
+        // borderRadius: 1
+        // borderStyle: 'dotted',
+        // borderWidth: 3,
+    },
     index: {
-        //fontFamily: 'Alef',
         fontSize: 20,
         color: 'white'
     },
@@ -40,9 +72,11 @@ const styles = StyleSheet.create({
         flex: 1
     },
     text: {
-        //fontFamily: 'Alef',
-        fontSize: 18,
         color: 'white',
         flexShrink: 1
+    },
+    step: {
+        fontSize: 16,
+        fontWeight: 'bold',
     }
 });

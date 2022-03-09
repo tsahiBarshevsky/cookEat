@@ -90,7 +90,7 @@ const RecipeScreen = ({ route, navigation }) => {
             <SharedElement id={`${item.id}.details.${origin}`} style={{ flex: 1 }}>
                 <View style={styles.recipe}>
                     <View style={{ alignItems: 'center', padding: 15 }}>
-                        <Text>{item.name}</Text>
+                        <Text style={styles.name}>{item.name}</Text>
                     </View>
                     <View style={styles.details}>
                         <Animatable.View
@@ -150,17 +150,9 @@ const RecipeScreen = ({ route, navigation }) => {
                             style={styles.ingredientsAndDirections}
                         >
                             <View style={styles.wrapper}>
-                                {/* <View style={styles.wrapperHeader}>
-                                    <Text style={styles.wrapperTitle}>מרכיבים</Text>
-                                    <Text style={styles.wrapperNote}>({item.ingredients.length} פריטים)</Text>
-                                </View> */}
                                 <Ingredients ingredients={item.ingredients} />
                             </View>
                             <View style={styles.wrapper}>
-                                {/* <View style={styles.wrapperHeader}>
-                                    <Text style={styles.wrapperTitle}>אופן ההכנה</Text>
-                                    <Text style={styles.wrapperNote}>({item.directions.length} פריטים)</Text>
-                                </View> */}
                                 <Directions directions={item.directions} />
                             </View>
                         </ScrollView>
@@ -305,6 +297,14 @@ const styles = StyleSheet.create({
         backgroundColor: background,
         borderTopRightRadius: 35,
         borderTopLeftRadius: 35
+    },
+    name: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'bold',
+        flexShrink: 1,
+        textAlign: 'center',
+        letterSpacing: 1
     },
     floatingButton: {
         position: 'absolute',

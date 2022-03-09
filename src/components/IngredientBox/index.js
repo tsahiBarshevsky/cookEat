@@ -9,7 +9,7 @@ const IngredientBox = ({ index, title, amount, unit }) => {
                 <Text style={styles.index}>{index + 1}</Text>
             </View>
             <View style={styles.content}>
-                <Text style={styles.text}>{title}</Text>
+                <Text style={[styles.text, styles.title]}>{title}</Text>
                 <Text style={styles.text}>{amount} {unit}</Text>
             </View>
         </View>
@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     },
     indexWrapper: {
+        justifyContent: 'center',
         alignItems: 'center',
         height: 30,
         width: 30,
@@ -32,16 +33,19 @@ const styles = StyleSheet.create({
         marginRight: 15
     },
     index: {
-        //fontFamily: 'Alef',
-        fontSize: 20,
+        fontSize: 18,
         color: 'white'
     },
     content: {
         flexDirection: 'column'
     },
     text: {
-        // fontFamily: 'Alef',
-        fontSize: 18,
+        // fontSize: 18,
         color: 'white',
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        flexShrink: 1
     }
 });

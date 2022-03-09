@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, FlatList } from 'react-native';
-import DirectionBox from '../IngredientBox';
+import { View, FlatList } from 'react-native';
+import DirectionBox from '../DirectionBox';
 
 const Directions = ({ directions }) => {
     return (
@@ -8,8 +8,7 @@ const Directions = ({ directions }) => {
             data={directions}
             style={{ marginTop: 5 }}
             keyExtractor={(item) => item.key}
-            contentContainerStyle={{ paddingBottom: 10 }}
-            ItemSeparatorComponent={() => <View style={{ marginVertical: 7 }} />}
+            contentContainerStyle={{ paddingBottom: 10, marginTop: 5 }}
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => {
                 return (
@@ -17,6 +16,7 @@ const Directions = ({ directions }) => {
                         key={index}
                         index={index}
                         value={item.value}
+                        size={directions.length}
                     />
                 )
             }}
