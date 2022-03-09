@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BackHandler, StyleSheet, StatusBar, Platform, View } from 'react-native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useSelector } from 'react-redux';
-import { ActionsBar, AnimatedFlatList } from '../../components';
+import { ActionsBar, AnimatedFlatList, Selector } from '../../components';
 import { background } from '../../utils/palette';
 
 const HomeScreen = ({ navigation }) => {
+    const [selectedCategory, setSelectedCategory] = useState('');
     const recipes = useSelector(state => state.recipes);
 
     const handleBackButtonClick = () => {
@@ -33,12 +34,19 @@ const HomeScreen = ({ navigation }) => {
         }
     }, []);
 
+    console.log(selectedCategory)
+
     return (
         <View style={styles.container}>
             <ExpoStatusBar style='light' />
             <ActionsBar size={recipes.length} />
+            <Selector
+                categories={['קטגוריה1', 'קטגוריה2', 'קטגוריה3', 'קטגוריה4', 'קטגוריה5']}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+            />
             <AnimatedFlatList
-                recipes={recipes}
+                recipes={recipes.filter((recipe) => recipe.category.includes(selectedCategory))}
                 origin={'Home'}
             />
         </View>
