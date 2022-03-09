@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { SharedElement } from 'react-navigation-shared-element';
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import * as Animatable from 'react-native-animatable';
+import SwitchSelector from 'react-native-switch-selector';
 import { updateFavorite } from '../../redux/actions/recipes';
 import { Ingredients, Directions, Detail } from '../../components';
-import { background, fadedBackground, primary } from '../../utils/palette';
+import { background, fadedBackground, primary, selected, unSelected } from '../../utils/palette';
 
 // React Native component
 import {
@@ -32,8 +33,9 @@ const { width } = Dimensions.get('window');
 const RecipeScreen = ({ route, navigation }) => {
     const { item, origin } = route.params;
     const recipes = useSelector(state => state.recipes);
-    const dispatch = useDispatch();
     const [favorite, setFavorite] = useState(item.favorite);
+    const dispatch = useDispatch();
+    const scorllRef = useRef();
 
     const handleFavoriteCahnge = async (id, favorite) => {
         const recipeRef = doc(db, "recipes", id);
@@ -126,26 +128,39 @@ const RecipeScreen = ({ route, navigation }) => {
                         delay={DURATION}
                         style={{ height: '100%', flex: 1 }}
                     >
+                        <SwitchSelector
+                            options={options}
+                            initial={0}
+                            onPress={(value) => scorllRef.current?.scrollTo({ x: value })}
+                            buttonMargin={6}
+                            textColor='rgba(255, 255, 255, 0.2)'
+                            buttonColor={selected}
+                            backgroundColor={unSelected}
+                            style={{ paddingHorizontal: 15 }}
+                        />
                         <ScrollView
                             horizontal
+                            ref={scorllRef}
                             decelerationRate="fast"
                             snapToInterval={width}
                             showsHorizontalScrollIndicator={false}
-                            style={styles.ingredientsAndDirections}
                             overScrollMode="never"
+                            pagingEnabled
+                            scrollEnabled={false}
+                            style={styles.ingredientsAndDirections}
                         >
                             <View style={styles.wrapper}>
-                                <View style={styles.wrapperHeader}>
+                                {/* <View style={styles.wrapperHeader}>
                                     <Text style={styles.wrapperTitle}>מרכיבים</Text>
                                     <Text style={styles.wrapperNote}>({item.ingredients.length} פריטים)</Text>
-                                </View>
+                                </View> */}
                                 <Ingredients ingredients={item.ingredients} />
                             </View>
                             <View style={styles.wrapper}>
-                                <View style={styles.wrapperHeader}>
+                                {/* <View style={styles.wrapperHeader}>
                                     <Text style={styles.wrapperTitle}>אופן ההכנה</Text>
                                     <Text style={styles.wrapperNote}>({item.directions.length} פריטים)</Text>
-                                </View>
+                                </View> */}
                                 <Directions directions={item.directions} />
                             </View>
                         </ScrollView>
@@ -271,6 +286,11 @@ RecipeScreen.sharedElements = (route) => {
     ];
 }
 
+const options = [
+    { label: "מרכיבים", value: width },
+    { label: "אופן ההכנה", value: 0 }
+];
+
 export default RecipeScreen;
 
 const styles = StyleSheet.create({
@@ -283,8 +303,8 @@ const styles = StyleSheet.create({
         flex: 1,
         marginTop: -30,
         backgroundColor: background,
-        borderTopRightRadius: 40,
-        borderTopLeftRadius: 40
+        borderTopRightRadius: 35,
+        borderTopLeftRadius: 35
     },
     floatingButton: {
         position: 'absolute',
