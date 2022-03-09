@@ -34,14 +34,12 @@ const HomeScreen = ({ navigation }) => {
         }
     }, []);
 
-    console.log(selectedCategory)
-
     return (
         <View style={styles.container}>
             <ExpoStatusBar style='light' />
             <ActionsBar size={recipes.length} />
             <Selector
-                categories={['קטגוריה1', 'קטגוריה2', 'קטגוריה3', 'קטגוריה4', 'קטגוריה5']}
+                categories={[...new Set(recipes.map(recipe => recipe.category))]}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
             />
