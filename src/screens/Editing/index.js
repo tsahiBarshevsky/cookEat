@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { SafeAreaView, ScrollView, TouchableOpacity, StyleSheet, Text, Platform, StatusBar, TextInput, View, KeyboardAvoidingView, ToastAndroid } from 'react-native';
+import { SafeAreaView, ScrollView, Image, TouchableOpacity, StyleSheet, Text, Platform, StatusBar, TextInput, View, KeyboardAvoidingView, ToastAndroid } from 'react-native';
 import { useDispatch } from 'react-redux';
 import uuid from 'react-native-uuid';
 import RadioForm from 'react-native-simple-radio-button';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 import update from 'immutability-helper';
+import { SharedElement } from 'react-navigation-shared-element';
 import { useSelector } from 'react-redux';
 import { editRecipe } from '../../redux/actions/recipes';
 import { background, primary, secondary, placeholder } from '../../utils/palette';
@@ -12,7 +13,6 @@ import { background, primary, secondary, placeholder } from '../../utils/palette
 // firebase
 import { doc, updateDoc } from 'firebase/firestore/lite';
 import { db } from '../../utils/firebase';
-import ScreenHeader from '../../components/Header';
 
 const EditingScreen = ({ route, navigation }) => {
     const { item } = route.params;
@@ -25,6 +25,8 @@ const EditingScreen = ({ route, navigation }) => {
     const [ingredients, setIngredients] = useState(item.ingredients);
     const [directions, setDirections] = useState(item.directions);
     const dispatch = useDispatch();
+
+    const origin = 'Editing';
 
     // References for next textInput
     const nameRef = useRef(null);
@@ -130,12 +132,33 @@ const EditingScreen = ({ route, navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <View style={styles.header}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TouchableOpacity
+                        onPress={() => navigation.goBack()}
+                        activeOpacity={0.8}
+                        style={styles.headerButton}
+                    >
+                        <Entypo style={{ transform: [{ translateY: 1 }] }} name="chevron-right" size={24} color="white" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerText}>
+                        עריכת {item.name.length > 20 ? `${item.name.slice(0, 20)}...` : item.name}
+                    </Text>
+                </View>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('ImagePreview', { image: item.image.url, origin })}
+                    activeOpacity={0.8}
+                >
+                    <SharedElement id={`image-preview.${origin}`}>
+                        <Image source={{ uri: item.image.url }} style={styles.image} resizeMode='cover' />
+                    </SharedElement>
+                </TouchableOpacity>
+            </View>
             <ScrollView
                 keyboardShouldPersistTaps="always"
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 15 }}
             >
-                <ScreenHeader text={`עריכת ${item.name}`} />
                 <KeyboardAvoidingView
                     enabled
                     behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -386,25 +409,45 @@ const styles = StyleSheet.create({
         backgroundColor: background,
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
     },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        height: 60
+    },
+    headerText: {
+        color: 'white',
+        fontSize: 17,
+        flexShrink: 1
+    },
+    headerButton: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 5
+    },
+    image: {
+        width: 40,
+        height: 40,
+        borderRadius: 10
+    },
     textInputWrapper: {
         flex: 1,
-        // height: 40,
         backgroundColor: primary,
         borderRadius: 15,
-        // flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
-        //elevation: 1,
         marginBottom: 10,
         paddingHorizontal: 15,
         paddingVertical: 5
     },
     label: {
-        // fontFamily: 'Alef',
         color: 'white'
     },
     textInput: {
-        // fontFamily: 'Alef',
         fontSize: 16,
         color: 'white',
         textAlign: 'right',
@@ -419,7 +462,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     text: {
-        // fontFamily: 'AlefBold',
         color: 'white',
         fontSize: 17,
         letterSpacing: 1.2
@@ -452,7 +494,6 @@ const styles = StyleSheet.create({
         elevation: 1
     },
     title: {
-        // fontFamily: 'AlefBold',
         fontSize: 20,
         color: 'white',
         marginBottom: 5
