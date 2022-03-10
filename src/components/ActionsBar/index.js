@@ -71,7 +71,7 @@ const ActionsBar = ({ size }) => {
                     container: {
                         borderTopLeftRadius: 20,
                         borderTopRightRadius: 20,
-                        height: 215,
+                        height: 220,
                         backgroundColor: background
                     },
                     draggableIcon: {
@@ -83,8 +83,10 @@ const ActionsBar = ({ size }) => {
                 }}
             >
                 <View>
-                    <View style={styles.email}>
-                        <Text style={styles.text}>{authentication.currentUser.email}</Text>
+                    <View style={styles.emailWrapper}>
+                        <Text style={[styles.text, styles.email]}>
+                            {authentication.currentUser.email}
+                        </Text>
                     </View>
                     <View style={{ paddingHorizontal: 15 }}>
                         <View style={styles.seperator} />
@@ -97,8 +99,10 @@ const ActionsBar = ({ size }) => {
                             style={[styles.BSButton, pressedAdd && styles.buttonHover]}
                             activeOpacity={1}
                         >
-                            <MaterialIcons style={styles.icon} name="post-add" size={18} color="white" />
-                            <Text style={styles.text}>הוספת מתכון</Text>
+                            <View style={styles.icon}>
+                                <MaterialIcons name="post-add" size={18} color="white" />
+                            </View>
+                            <Text style={styles.text}>הוספת מתכון חדש</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.item}>
@@ -109,7 +113,9 @@ const ActionsBar = ({ size }) => {
                             style={[styles.BSButton, pressedFavorite && styles.buttonHover]}
                             activeOpacity={1}
                         >
-                            <FontAwesome style={styles.icon} name="bookmark" size={18} color="white" />
+                            <View style={styles.icon}>
+                                <FontAwesome name="bookmark" size={18} color="white" />
+                            </View>
                             <Text style={styles.text}>מתכונים מועדפים</Text>
                         </TouchableOpacity>
                     </View>
@@ -121,7 +127,9 @@ const ActionsBar = ({ size }) => {
                             style={[styles.BSButton, pressedLogout && styles.buttonHover]}
                             activeOpacity={1}
                         >
-                            <MaterialIcons style={styles.icon} name="logout" size={18} color="white" />
+                            <View style={styles.icon}>
+                                <MaterialIcons name="logout" size={18} color="white" />
+                            </View>
                             <Text style={styles.text}>התנתקות</Text>
                         </TouchableOpacity>
                     </View>
@@ -167,6 +175,10 @@ const styles = StyleSheet.create({
         color: placeholder
     },
     email: {
+        fontSize: 17,
+        textAlign: 'center'
+    },
+    emailWrapper: {
         alignItems: 'center',
         marginBottom: 5
     },
@@ -181,6 +193,10 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     icon: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 25,
+        height: 25,
         marginRight: 10
     },
     BSButton: {
