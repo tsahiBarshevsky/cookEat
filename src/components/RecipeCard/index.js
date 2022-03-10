@@ -106,10 +106,10 @@ const RecipeCard = ({ item, origin }) => {
             </TouchableOpacity >
             <RBSheet
                 ref={bottomSheetRef}
-                animationType='fade'
+                animationType='slide'
                 closeOnDragDown
-                closeDuration={DURATION}
                 openDuration={DURATION}
+                closeDuration={DURATION}
                 customStyles={{
                     container: {
                         borderTopLeftRadius: 20,
@@ -121,7 +121,7 @@ const RecipeCard = ({ item, origin }) => {
                         backgroundColor: secondary
                     },
                     wrapper: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)'
+                        backgroundColor: 'rgba(18, 31, 37, 0.75)'
                     }
                 }}
             >

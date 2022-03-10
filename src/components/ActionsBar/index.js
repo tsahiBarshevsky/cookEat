@@ -3,6 +3,7 @@ import { StyleSheet, Image, View, Text, TouchableOpacity } from 'react-native';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { Feather, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { Modalize as BottomSheet } from 'react-native-modalize';
 import { background, hover, placeholder, primary, secondary } from '../../utils/palette';
 
 // firabse
@@ -35,54 +36,46 @@ const ActionsBar = ({ size }) => {
     }
 
     return (
-        <View style={styles.container}>
-            <TouchableOpacity
-                activeOpacity={0.9}
-                onPress={() => bottomSheetRef.current?.open()}
-                onPressIn={() => setPressed(true)}
-                onPressOut={() => setPressed(false)}
-                style={[styles.wrapper, pressed && styles.button]}
-            >
-                <Feather name="menu" size={24} color="rgba(255, 255, 255, 0.8)" />
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={() => navigation.navigate("Search", { size })}
-                activeOpacity={1}
-                style={styles.searchButton}
-            >
-                <Text style={styles.placeholder}>
-                    חיפוש מבין {size} מתכונים...
-                </Text>
-            </TouchableOpacity>
-            <View style={[styles.wrapper, styles.image]}>
-                <Image
-                    source={require('../../../assets/images/boy.png')}
-                    style={{ height: 30, width: 30 }}
-                    resizeMode='cover'
-                />
+        <>
+            <View style={styles.container}>
+                <TouchableOpacity
+                    activeOpacity={0.9}
+                    onPress={() => bottomSheetRef.current?.open()}
+                    onPressIn={() => setPressed(true)}
+                    onPressOut={() => setPressed(false)}
+                    style={[styles.wrapper, pressed && styles.button]}
+                >
+                    <Feather name="menu" size={24} color="rgba(255, 255, 255, 0.8)" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate("Search", { size })}
+                    activeOpacity={1}
+                    style={styles.searchButton}
+                >
+                    <Text style={styles.placeholder}>
+                        חיפוש מבין {size} מתכונים...
+                    </Text>
+                </TouchableOpacity>
+                <View style={[styles.wrapper, styles.image]}>
+                    <Image
+                        source={require('../../../assets/images/boy.png')}
+                        style={{ height: 30, width: 30 }}
+                        resizeMode='cover'
+                    />
+                </View>
             </View>
-            <RBSheet
+            <BottomSheet
                 ref={bottomSheetRef}
-                animationType='fade'
-                closeOnDragDown
-                closeDuration={DURATION}
-                openDuration={DURATION}
-                customStyles={{
-                    container: {
-                        borderTopLeftRadius: 20,
-                        borderTopRightRadius: 20,
-                        height: 220,
-                        backgroundColor: background
-                    },
-                    draggableIcon: {
-                        backgroundColor: secondary
-                    },
-                    wrapper: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)'
-                    }
-                }}
+                // threshold={50}
+                // alwaysOpen={0}
+                adjustToContentHeight
+                handlePosition='inside'
+                modalStyle={styles.modalStyle}
+                handleStyle={{ backgroundColor: 'white' }}
+                openAnimationConfig={{ timing: { duration: 500 } }}
+                closeAnimationConfig={{ timing: { duration: 500 } }}
             >
-                <View>
+                <View style={styles.bottomSheetContainer}>
                     <View style={styles.emailWrapper}>
                         <Text style={[styles.text, styles.email]}>
                             {authentication.currentUser.email}
@@ -100,7 +93,7 @@ const ActionsBar = ({ size }) => {
                             activeOpacity={1}
                         >
                             <View style={styles.icon}>
-                                <MaterialIcons name="post-add" size={18} color="white" />
+                                <MaterialIcons name="post-add" size={22} color="white" />
                             </View>
                             <Text style={styles.text}>הוספת מתכון חדש</Text>
                         </TouchableOpacity>
@@ -128,14 +121,14 @@ const ActionsBar = ({ size }) => {
                             activeOpacity={1}
                         >
                             <View style={styles.icon}>
-                                <MaterialIcons name="logout" size={18} color="white" />
+                                <MaterialIcons style={{ transform: [{ translateX: 3 }] }} name="logout" size={20} color="white" />
                             </View>
                             <Text style={styles.text}>התנתקות</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
-            </RBSheet>
-        </View >
+            </BottomSheet>
+        </>
     )
 }
 
@@ -154,6 +147,15 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         height: 50,
         elevation: 2
+    },
+    bottomSheetContainer: {
+        height: 250,
+        paddingTop: 25
+    },
+    modalStyle: {
+        backgroundColor: 'grey',
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30
     },
     wrapper: {
         width: 40,
