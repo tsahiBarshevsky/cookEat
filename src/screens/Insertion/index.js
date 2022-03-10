@@ -4,10 +4,10 @@ import * as ImagePicker from 'expo-image-picker';
 import { useDispatch } from 'react-redux';
 import uuid from 'react-native-uuid';
 import RadioForm from 'react-native-simple-radio-button';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 import update from 'immutability-helper';
 import { UIActivityIndicator } from 'react-native-indicators';
-import { ScreenHeader } from '../../components';
+import { SharedElement } from 'react-navigation-shared-element';
 import { addNewRecipe } from '../../redux/actions/recipes';
 import { background, primary, secondary, placeholder } from '../../utils/palette';
 import config from '../../utils/config';
@@ -26,9 +26,10 @@ const InsertionScreen = ({ navigation }) => {
     const [directions, setDirections] = useState([{}]);
     const [formKey, setFormKey] = useState(0);
     const [image, setImage] = useState(null);
-    const [cloudnirayLink, setCloudnirayLink] = useState('');
     const [disabled, setDisabled] = useState(false);
     const dispatch = useDispatch();
+
+    const origin = 'Insertion';
 
     // References for next textInput
     const nameRef = useRef(null);
@@ -90,33 +91,6 @@ const InsertionScreen = ({ navigation }) => {
         setDirections(_directions);
     }
 
-    const clearForm = () => {
-        setName('');
-        setQuantity('');
-        setCategory('');
-        setTime({ value: '', unit: 'דקה' });
-        setIngredients([{}]);
-        setDirections([{}]);
-        setFormKey(Math.random());
-        setYoutube('');
-    }
-
-    const handleUploadImage = (image) => {
-        const data = new FormData();
-        data.append('file', image);
-        data.append('upload_preset', 'cookEat');
-        data.append('cloud_name', 'ddofzlgdu');
-        fetch('https://api.cloudinary.com/v1_1/ddofzlgdu/image/upload', {
-            method: 'POST',
-            body: data
-        })
-            .then(res => res.json())
-            .then(data => {
-                // console.log(data);
-                setCloudnirayLink(data);
-            });
-    }
-
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -124,16 +98,8 @@ const InsertionScreen = ({ navigation }) => {
             //aspect: [16, 9],
             quality: 1,
         });
-
-        if (!result.cancelled) {
+        if (!result.cancelled)
             setImage(result.uri);
-            // const newFile = {
-            //     uri: result.uri,
-            //     type: `test/${result.uri.split(".")[1]}`,
-            //     name: `test.${result.uri.split(".")[1]}`
-            // }
-            // handleUploadImage(newFile);
-        }
     }
 
     const handleAddDocument = async (newRecipe) => {
@@ -207,6 +173,37 @@ const InsertionScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <View style={styles.header}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TouchableOpacity
+                        onPress={() => navigation.goBack()}
+                        activeOpacity={0.8}
+                        style={styles.headerButton}
+                    >
+                        <Entypo style={{ transform: [{ translateY: 1 }] }} name="chevron-right" size={24} color="white" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerText}>הוספת מתכון</Text>
+                </View>
+                {!image ?
+                    <TouchableOpacity
+                        onPress={() => pickImage()}
+                        activeOpacity={0.8}
+                        style={styles.upload}
+                    >
+                        <MaterialCommunityIcons name="image-plus" size={20} color="#FFFFFF99" />
+                    </TouchableOpacity>
+                    :
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('ImagePreview', { image, origin })}
+                        onLongPress={() => pickImage()}
+                        activeOpacity={0.8}
+                    >
+                        <SharedElement id={`image-preview.${origin}`}>
+                            <Image source={{ uri: image }} style={styles.image} resizeMode='cover' />
+                        </SharedElement>
+                    </TouchableOpacity>
+                }
+            </View>
             <ScrollView
                 keyboardShouldPersistTaps="always"
                 showsVerticalScrollIndicator={false}
@@ -216,8 +213,6 @@ const InsertionScreen = ({ navigation }) => {
                     enabled
                     behavior={Platform.OS === 'ios' ? 'padding' : null}
                 >
-                    <ScreenHeader text='הוספת מתכון' />
-                    {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
                     <View style={styles.textInputWrapper}>
                         <Text style={styles.label}>שם המתכון</Text>
                         <TextInput
@@ -470,6 +465,39 @@ const styles = StyleSheet.create({
         backgroundColor: background,
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
     },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        height: 60
+    },
+    headerText: {
+        color: 'white',
+        fontSize: 17,
+        flexShrink: 1
+    },
+    headerButton: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 5
+    },
+    upload: {
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        backgroundColor: secondary
+    },
+    image: {
+        width: 40,
+        height: 40,
+        borderRadius: 10
+    },
     textInputWrapper: {
         flex: 1,
         backgroundColor: primary,
@@ -533,9 +561,8 @@ const styles = StyleSheet.create({
         elevation: 1
     },
     title: {
-        // // fontFamily: 'AlefBold',
         fontSize: 20,
         color: 'white',
-        marginBottom: 5
+        marginVertical: 10
     }
 });

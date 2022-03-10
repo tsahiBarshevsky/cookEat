@@ -13,7 +13,7 @@ const ScreenHeader = ({ text }) => {
                 activeOpacity={0.8}
                 style={styles.button}
             >
-                <Entypo name="chevron-right" size={24} color="white" />
+                <Entypo style={{ transform: [{ translateY: 1 }] }} name="chevron-right" size={24} color="white" />
             </TouchableOpacity>
             <Text style={styles.text}>
                 {text.length > 30 ? `${text.slice(0, 30)}...` : text}

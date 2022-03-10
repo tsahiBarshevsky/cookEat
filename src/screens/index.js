@@ -7,3 +7,4 @@ export { default as SplashScreen } from './Splash';
 export { default as RecipeScreen } from './Recipe';
 export { default as SearchScreen } from './Search';
 export { default as FavoritesScreen } from './Favorites';
+export { default as ImagePreview } from './ImagePreview';

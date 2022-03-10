@@ -7,6 +7,7 @@ import {
     EditingScreen,
     FavoritesScreen,
     HomeScreen,
+    ImagePreview,
     InsertionScreen,
     LoginScreen,
     RecipeScreen,
@@ -62,6 +63,11 @@ const AppNavigator = () => {
                 <Stack.Screen
                     name='Insertion'
                     component={InsertionScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name='ImagePreview'
+                    component={ImagePreview}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
