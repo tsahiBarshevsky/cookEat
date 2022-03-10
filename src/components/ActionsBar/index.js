@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { StyleSheet, Image, View, Text, TouchableOpacity } from 'react-native';
 import RBSheet from "react-native-raw-bottom-sheet";
-import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { Feather, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { background, hover, placeholder, primary, secondary } from '../../utils/palette';
 
@@ -14,14 +14,15 @@ const DURATION = 150;
 const ActionsBar = ({ size }) => {
     const [pressed, setPressed] = useState(false);
     const [pressedAdd, setPressedAdd] = useState(false);
+    const [pressedFavorite, setPressedFavorite] = useState(false);
     const [pressedLogout, setPressedLogout] = useState(false);
     const bottomSheetRef = useRef(null);
     const navigation = useNavigation();
 
-    const onAddNewRecipe = () => {
+    const onNavigate = (route) => {
         bottomSheetRef.current?.close();
         setTimeout(() => {
-            navigation.navigate('Insertion');
+            navigation.navigate(`${route}`);
         }, DURATION + 50);
     }
 
@@ -70,7 +71,7 @@ const ActionsBar = ({ size }) => {
                     container: {
                         borderTopLeftRadius: 20,
                         borderTopRightRadius: 20,
-                        height: 170,
+                        height: 215,
                         backgroundColor: background
                     },
                     draggableIcon: {
@@ -90,7 +91,7 @@ const ActionsBar = ({ size }) => {
                     </View>
                     <View style={styles.item}>
                         <TouchableOpacity
-                            onPress={() => onAddNewRecipe()}
+                            onPress={() => onNavigate('Insertion')}
                             onPressIn={() => setPressedAdd(true)}
                             onPressOut={() => setPressedAdd(false)}
                             style={[styles.BSButton, pressedAdd && styles.buttonHover]}
@@ -98,6 +99,18 @@ const ActionsBar = ({ size }) => {
                         >
                             <MaterialIcons style={styles.icon} name="post-add" size={18} color="white" />
                             <Text style={styles.text}>הוספת מתכון</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.item}>
+                        <TouchableOpacity
+                            onPress={() => onNavigate('Favorites')}
+                            onPressIn={() => setPressedFavorite(true)}
+                            onPressOut={() => setPressedFavorite(false)}
+                            style={[styles.BSButton, pressedFavorite && styles.buttonHover]}
+                            activeOpacity={1}
+                        >
+                            <FontAwesome style={styles.icon} name="bookmark" size={18} color="white" />
+                            <Text style={styles.text}>מתכונים מועדפים</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.item}>
