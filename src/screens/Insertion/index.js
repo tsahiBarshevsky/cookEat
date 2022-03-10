@@ -7,6 +7,7 @@ import RadioForm from 'react-native-simple-radio-button';
 import { AntDesign } from '@expo/vector-icons';
 import update from 'immutability-helper';
 import { UIActivityIndicator } from 'react-native-indicators';
+import { ScreenHeader } from '../../components';
 import { addNewRecipe } from '../../redux/actions/recipes';
 import { background, primary, secondary, placeholder } from '../../utils/palette';
 import config from '../../utils/config';
@@ -215,9 +216,7 @@ const InsertionScreen = ({ navigation }) => {
                     enabled
                     behavior={Platform.OS === 'ios' ? 'padding' : null}
                 >
-                    <TouchableOpacity onPress={() => pickImage()}>
-                        <Text>בחר תמונה</Text>
-                    </TouchableOpacity>
+                    <ScreenHeader text='הוספת מתכון' />
                     {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
                     <View style={styles.textInputWrapper}>
                         <Text style={styles.label}>שם המתכון</Text>

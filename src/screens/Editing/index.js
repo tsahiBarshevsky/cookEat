@@ -12,6 +12,7 @@ import { background, primary, secondary, placeholder } from '../../utils/palette
 // firebase
 import { doc, updateDoc } from 'firebase/firestore/lite';
 import { db } from '../../utils/firebase';
+import ScreenHeader from '../../components/Header';
 
 const EditingScreen = ({ route, navigation }) => {
     const { item } = route.params;
@@ -134,6 +135,7 @@ const EditingScreen = ({ route, navigation }) => {
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 15 }}
             >
+                <ScreenHeader text={`עריכת ${item.name}`} />
                 <KeyboardAvoidingView
                     enabled
                     behavior={Platform.OS === 'ios' ? 'padding' : null}
