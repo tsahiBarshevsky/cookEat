@@ -1,17 +1,25 @@
 import React from 'react';
-import { StyleSheet, Platform, StatusBar, View, SafeAreaView, Image, Text } from 'react-native';
+import { StyleSheet, Platform, StatusBar, View, SafeAreaView, Image, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
-import { AnimatedFlatList, ScreenHeader } from '../../components';
+import { Entypo } from '@expo/vector-icons';
+import { AnimatedFlatList } from '../../components';
 import { background } from '../../utils/palette';
 
-const FavoritesScreen = () => {
+const FavoritesScreen = ({ navigation }) => {
     const recipes = useSelector(state => state.recipes);
     const favorites = recipes.filter((recipe) => recipe.favorite);
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={{ paddingHorizontal: 15 }}>
-                <ScreenHeader text={'מתכונים מועדפים'} />
+            <View style={styles.header}>
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    activeOpacity={0.8}
+                    style={styles.headerButton}
+                >
+                    <Entypo style={{ transform: [{ translateY: 1 }] }} name="chevron-right" size={24} color="white" />
+                </TouchableOpacity>
+                <Text style={styles.headerText}>מתכונים מועדפים</Text>
             </View>
             {favorites.length > 0 ?
                 <AnimatedFlatList
@@ -39,6 +47,27 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
         backgroundColor: background
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        width: '100%',
+        height: 60,
+        paddingHorizontal: 15
+    },
+    headerText: {
+        color: 'white',
+        fontSize: 17,
+        flexShrink: 1
+    },
+    headerButton: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 5
     },
     text: {
         color: 'white'
