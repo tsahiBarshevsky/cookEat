@@ -5,6 +5,7 @@ import { Modalize } from 'react-native-modalize';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import Modal from "react-native-modal";
+import Toast from 'react-native-toast-message';
 import { removeRecipe } from '../../redux/actions/recipes';
 import { resetPickecRecipe } from '../../redux/actions/pickedRecipe';
 import { primary, hover } from '../../utils/palette';
@@ -62,7 +63,16 @@ const BottomSheet = ({ bottomSheetRef }) => {
                     .then((res) => console.log(res))
                     .catch((error) => console.log("error: ", error.message));
             setTimeout(() => {
-                ToastAndroid.show(`${name} נמחק בהצלחה`, ToastAndroid.LONG);
+                Toast.show({
+                    type: 'snackbar',
+                    position: 'bottom',
+                    bottomOffset: 20,
+                    props: {
+                        type: 'success',
+                        text1: 'המחיקה בוצעה',
+                        text2: 'המתכון נמחק בהצלחה'
+                    }
+                });
             }, DURATION);
         }
     }

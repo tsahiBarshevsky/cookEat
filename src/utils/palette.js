@@ -6,6 +6,7 @@ const hover = 'rgba(40, 49, 54, 0.25)';
 const selected = 'rgb(18, 31, 37)';
 const unSelected = 'rgba(18, 31, 37, 0.35)';
 const placeholder = 'rgba(255, 255, 255, 0.3)';
+const toast = '#2f3032';
 
 export {
     background,
@@ -15,5 +16,6 @@ export {
     hover,
     selected,
     unSelected,
-    placeholder
+    placeholder,
+    toast
 };

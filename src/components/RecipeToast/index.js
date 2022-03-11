@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
-import { secondary } from '../../utils/palette';
+import { secondary, toast } from '../../utils/palette';
 
 const RecipeToast = ({ props }) => {
     return (
@@ -24,10 +24,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '95%',
         height: 45,
-        backgroundColor: secondary,
+        backgroundColor: toast,
         paddingHorizontal: 5,
         borderRadius: 10,
-        borderColor: 'rgba(255, 255, 255, 0.25)',
+        elevation: 2,
+        borderColor: 'rgba(255,255,255,0.15)',
         borderWidth: 1
     },
     image: {
