@@ -2,12 +2,14 @@ import React from 'react';
 import { StyleSheet, Platform, StatusBar, View, SafeAreaView, Image, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import { Entypo } from '@expo/vector-icons';
-import { AnimatedFlatList } from '../../components';
+import { AnimatedFlatList, BottomSheet } from '../../components';
+import { AppContext } from '../../utils/context';
 import { background } from '../../utils/palette';
 
 const FavoritesScreen = ({ navigation }) => {
     const recipes = useSelector(state => state.recipes);
     const favorites = recipes.filter((recipe) => recipe.favorite);
+    const { bottomSheetRef } = React.useContext(AppContext);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -36,6 +38,7 @@ const FavoritesScreen = ({ navigation }) => {
                     <Text style={[styles.text, styles.message]}>עוד לא הוספת מתכונים מועדפים</Text>
                 </View>
             }
+            <BottomSheet bottomSheetRef={bottomSheetRef} />
         </SafeAreaView>
     )
 }

@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { BackHandler, StyleSheet, StatusBar, Platform, View } from 'react-native';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useSelector } from 'react-redux';
-import { ActionsBar, AnimatedFlatList, Selector } from '../../components';
+import { ActionsBar, AnimatedFlatList, BottomSheet, Selector } from '../../components';
+import { AppContext } from '../../utils/context';
 import { background } from '../../utils/palette';
 
 const HomeScreen = ({ navigation }) => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const recipes = useSelector(state => state.recipes);
+    const { bottomSheetRef, open } = React.useContext(AppContext);
 
     const handleBackButtonClick = () => {
         const routes = navigation.getState()?.routes;
@@ -47,6 +49,7 @@ const HomeScreen = ({ navigation }) => {
                 recipes={recipes.filter((recipe) => recipe.category.includes(selectedCategory))}
                 origin={'Home'}
             />
+            <BottomSheet bottomSheetRef={bottomSheetRef} />
         </View>
     )
 }

@@ -1,10 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { StyleSheet, Image, View, Text, TouchableOpacity } from 'react-native';
-import RBSheet from "react-native-raw-bottom-sheet";
 import { Feather, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Modalize as BottomSheet } from 'react-native-modalize';
-import { background, hover, placeholder, primary, secondary } from '../../utils/palette';
+import { hover, placeholder, primary, secondary } from '../../utils/palette';
 
 // firabse
 import { signOut } from 'firebase/auth';
@@ -66,12 +65,11 @@ const ActionsBar = ({ size }) => {
             </View>
             <BottomSheet
                 ref={bottomSheetRef}
-                // threshold={50}
-                // alwaysOpen={0}
+                threshold={50}
                 adjustToContentHeight
                 handlePosition='inside'
                 modalStyle={styles.modalStyle}
-                handleStyle={{ backgroundColor: 'white' }}
+                handleStyle={styles.handleStyle}
                 openAnimationConfig={{ timing: { duration: 500 } }}
                 closeAnimationConfig={{ timing: { duration: 500 } }}
             >
@@ -123,7 +121,7 @@ const ActionsBar = ({ size }) => {
                             <View style={styles.icon}>
                                 <MaterialIcons style={{ transform: [{ translateX: 3 }] }} name="logout" size={20} color="white" />
                             </View>
-                            <Text style={styles.text}>התנתקות</Text>
+                            <Text style={styles.text}>התנתקות מהחשבון</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -149,13 +147,17 @@ const styles = StyleSheet.create({
         elevation: 2
     },
     bottomSheetContainer: {
-        height: 250,
+        height: 220,
         paddingTop: 25
     },
     modalStyle: {
-        backgroundColor: 'grey',
+        backgroundColor: primary,
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30
+    },
+    handleStyle: {
+        backgroundColor: 'white',
+        marginTop: 2
     },
     wrapper: {
         width: 40,
@@ -178,7 +180,9 @@ const styles = StyleSheet.create({
     },
     email: {
         fontSize: 17,
-        textAlign: 'center'
+        textAlign: 'center',
+        letterSpacing: 1,
+        flexShrink: 1
     },
     emailWrapper: {
         alignItems: 'center',

@@ -3,9 +3,10 @@ import { StyleSheet, Platform, StatusBar, Text, SafeAreaView, TextInput, Touchab
 import { EvilIcons, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import update from 'immutability-helper';
-import { AnimatedFlatList } from '../../components';
+import { AnimatedFlatList, BottomSheet } from '../../components';
 import { background, primary, placeholder } from '../../utils/palette';
 import { addNewSearchTerm, removeSearchTerm } from '../../redux/actions/searchTerms';
+import { AppContext } from '../../utils/context';
 import { setRecentSearchTerms } from '../../utils/AsyncStorageHandler';
 
 const SearchScreen = ({ route }) => {
@@ -16,6 +17,7 @@ const SearchScreen = ({ route }) => {
     const searchTerms = useSelector(state => state.searchTerms);
     const dispatch = useDispatch();
     const keywordRef = useRef(null);
+    const { bottomSheetRef } = React.useContext(AppContext);
     let result = recipes.filter((recipe) => recipe.name.includes(keyword));
 
     const handleSearch = (key) => {
@@ -135,6 +137,7 @@ const SearchScreen = ({ route }) => {
                     }
                 </View>
             }
+            <BottomSheet bottomSheetRef={bottomSheetRef} />
         </SafeAreaView>
     )
 }

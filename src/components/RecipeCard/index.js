@@ -9,6 +9,8 @@ import Modal from "react-native-modal";
 import { removeRecipe } from '../../redux/actions/recipes';
 import { background, primary, secondary } from '../../utils/palette';
 
+import { AppContext } from '../../utils/context';
+
 // firebase
 import { doc, deleteDoc } from 'firebase/firestore/lite';
 import { db } from '../../utils/firebase';
@@ -21,9 +23,16 @@ const RecipeCard = ({ item, origin }) => {
     const [pressInDelete, setPressInDelete] = useState(false)
     const [isModalVisible, setModalVisible] = useState(false);
     const navigation = useNavigation();
-    const bottomSheetRef = useRef(null);
+    // const bottomSheetRef = useRef(null);
     const dispatch = useDispatch();
     const recipes = useSelector(state => state.recipes);
+
+    const { bottomSheetRef, open } = React.useContext(AppContext);
+
+    const onOpenOptions = () => {
+        open();
+        dispatch({ type: 'SET_PICKED_RECIPE', pickedRecipe: item });
+    }
 
     const onEditRecipe = () => {
         bottomSheetRef.current?.close();
@@ -63,7 +72,7 @@ const RecipeCard = ({ item, origin }) => {
     }
 
     return (
-        <View>
+        <>
             <TouchableOpacity
                 activeOpacity={0.9}
                 onPress={() => navigation.navigate('Recipe', { item, origin })}
@@ -74,37 +83,23 @@ const RecipeCard = ({ item, origin }) => {
                             <Image source={{ uri: item.image.url }} style={styles.image} />
                         </SharedElement>
                     </View>
-                    {origin !== 'categories' ?
-                        <View>
-                            <View style={styles.details}>
-                                <View style={styles.category}>
-                                    <Text style={styles.categoryText}>{item.category}</Text>
-                                </View>
-                                <TouchableOpacity
-                                    onPress={() => bottomSheetRef.current?.open()}
-                                    activeOpacity={0.8}
-                                >
-                                    <MaterialCommunityIcons name="dots-vertical" size={24} color="white" />
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{ alignItems: 'flex-start' }}>
-                                <Text adjustsFontSizeToFit style={styles.title}>{item.name}</Text>
-                            </View>
+                    <View style={styles.details}>
+                        <View style={styles.category}>
+                            <Text style={styles.categoryText}>{item.category}</Text>
                         </View>
-                        :
-                        <View style={[styles.details, { alignItems: 'flex-start' }]}>
-                            <Text style={styles.title}>{item.name}</Text>
-                            <TouchableOpacity
-                                onPress={() => bottomSheetRef.current?.open()}
-                                activeOpacity={0.8}
-                            >
-                                <MaterialCommunityIcons name="dots-vertical" size={24} color="white" />
-                            </TouchableOpacity>
-                        </View>
-                    }
+                        <TouchableOpacity
+                            onPress={() => onOpenOptions()}
+                            activeOpacity={0.8}
+                        >
+                            <MaterialCommunityIcons name="dots-vertical" size={24} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{ alignItems: 'flex-start' }}>
+                        <Text adjustsFontSizeToFit style={styles.title}>{item.name}</Text>
+                    </View>
                 </View>
-            </TouchableOpacity >
-            <RBSheet
+            </TouchableOpacity>
+            {/* <RBSheet
                 ref={bottomSheetRef}
                 animationType='slide'
                 closeOnDragDown
@@ -155,7 +150,7 @@ const RecipeCard = ({ item, origin }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-            </RBSheet>
+            </RBSheet> */}
             <Modal
                 isVisible={isModalVisible}
                 onBackdropPress={() => setModalVisible(false)}
@@ -190,7 +185,7 @@ const RecipeCard = ({ item, origin }) => {
                     </TouchableOpacity>
                 </View>
             </Modal>
-        </View >
+        </>
     )
 }
 
