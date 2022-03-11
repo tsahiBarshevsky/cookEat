@@ -241,7 +241,6 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     modalButtonText: {
-        // fontFamily: 'Alef',
         fontSize: 18,
         color: 'white'
     }

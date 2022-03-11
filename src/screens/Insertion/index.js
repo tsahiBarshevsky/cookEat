@@ -8,6 +8,7 @@ import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 import update from 'immutability-helper';
 import { UIActivityIndicator } from 'react-native-indicators';
 import { SharedElement } from 'react-navigation-shared-element';
+import Toast from 'react-native-toast-message';
 import { addNewRecipe } from '../../redux/actions/recipes';
 import { background, primary, secondary, placeholder } from '../../utils/palette';
 import config from '../../utils/config';
@@ -112,6 +113,15 @@ const InsertionScreen = ({ navigation }) => {
         finally {
             dispatch(addNewRecipe(newRecipe)); // Update store
             navigation.navigate('Home');
+            Toast.show({
+                type: 'recipeToast',
+                position: 'bottom',
+                bottomOffset: 20,
+                props: {
+                    message: 'המתכון נוסף בהצלחה',
+                    image: newRecipe.image.url
+                }
+            });
         }
     }
 

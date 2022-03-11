@@ -4,6 +4,7 @@ import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import * as Animatable from 'react-native-animatable';
 import SwitchSelector from 'react-native-switch-selector';
+import Toast from 'react-native-toast-message';
 import { updateFavorite } from '../../redux/actions/recipes';
 import { Ingredients, Directions, Detail } from '../../components';
 import { background, fadedBackground, primary, selected, unSelected } from '../../utils/palette';
@@ -50,6 +51,16 @@ const RecipeScreen = ({ route, navigation }) => {
             setFavorite(favorite);
             const index = recipes.findIndex(recipes => recipes.id === id);
             dispatch(updateFavorite(index, favorite)); // Update store
+            if (favorite)
+                Toast.show({
+                    type: 'recipeToast',
+                    position: 'bottom',
+                    bottomOffset: 20,
+                    props: {
+                        message: 'המתכון נוסף למועדפים',
+                        image: item.image.url
+                    }
+                });
         }
     }
 

@@ -7,3 +7,4 @@ export { default as Detail } from './Detail';
 export { default as ActionsBar } from './ActionsBar';
 export { default as Selector } from './Selector';
 export { default as BottomSheet } from './BottomSheet';
+export { default as RecipeToast } from './RecipeToast';

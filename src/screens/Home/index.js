@@ -9,7 +9,7 @@ import { background } from '../../utils/palette';
 const HomeScreen = ({ navigation }) => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const recipes = useSelector(state => state.recipes);
-    const { bottomSheetRef, open } = React.useContext(AppContext);
+    const { bottomSheetRef } = React.useContext(AppContext);
 
     const handleBackButtonClick = () => {
         const routes = navigation.getState()?.routes;

@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { SafeAreaView, ScrollView, Image, TouchableOpacity, StyleSheet, Text, Platform, StatusBar, TextInput, View, KeyboardAvoidingView, ToastAndroid } from 'react-native';
+import { SafeAreaView, ScrollView, Image, TouchableOpacity, StyleSheet, Text, Platform, StatusBar, TextInput, View, KeyboardAvoidingView } from 'react-native';
 import { useDispatch } from 'react-redux';
 import uuid from 'react-native-uuid';
 import RadioForm from 'react-native-simple-radio-button';
 import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 import update from 'immutability-helper';
 import { SharedElement } from 'react-navigation-shared-element';
+import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { editRecipe } from '../../redux/actions/recipes';
 import { background, primary, secondary, placeholder } from '../../utils/palette';
@@ -125,7 +126,15 @@ const EditingScreen = ({ route, navigation }) => {
             dispatch(editRecipe(index, editedRecipe)) // Update store
             navigation.goBack();
             setTimeout(() => {
-                ToastAndroid.show(`${editedRecipe.name} נערך בהצלחה`, ToastAndroid.SHORT);
+                Toast.show({
+                    type: 'recipeToast',
+                    position: 'bottom',
+                    bottomOffset: 20,
+                    props: {
+                        message: 'המתכון נערך בהצלחה',
+                        image: item.image.url
+                    }
+                });
             }, 500);
         }
     }
