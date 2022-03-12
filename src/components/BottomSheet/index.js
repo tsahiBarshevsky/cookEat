@@ -43,7 +43,6 @@ const BottomSheet = ({ bottomSheetRef }) => {
     }
 
     const onRemoveRecipe = async () => {
-        const name = pickedRecipe.name;
         const index = recipes.findIndex(recipe => recipe.id === pickedRecipe.id);
         try {
             await deleteDoc(doc(db, "recipes", pickedRecipe.id));

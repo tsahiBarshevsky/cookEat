@@ -181,7 +181,7 @@ const InsertionScreen = ({ navigation }) => {
         }
         else {
             newRecipe.image = {
-                url: 'https://images.pexels.com/photos/1556688/pexels-photo-1556688.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+                url: 'https://res.cloudinary.com/ddofzlgdu/image/upload/v1647108359/pexels-curtis-adams-10099256_dgyisj.jpg',
                 public_id: null
             };
             handleAddDocument(newRecipe);

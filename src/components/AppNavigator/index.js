@@ -1,6 +1,7 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
+import { background } from '../../utils/palette';
 
 // App screens
 import {
@@ -18,10 +19,17 @@ import {
 } from '../../screens';
 
 const Stack = createSharedElementStackNavigator();
+const theme = {
+    ...DefaultTheme,
+    colors: {
+        ...DefaultTheme.colors,
+        background: background
+    }
+}
 
 const AppNavigator = () => {
     return (
-        <NavigationContainer>
+        <NavigationContainer theme={theme}>
             <Stack.Navigator initialRouteName='Login'>
                 <Stack.Screen
                     name='Registration'
