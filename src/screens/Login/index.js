@@ -231,7 +231,7 @@ const LoginScreen = ({ navigation }) => {
                         style={styles.registration}
                         activeOpacity={1}
                     >
-                        <Text style={styles.text}>חדש כאן? צור חשבון!</Text>
+                        <Text style={styles.text}>פעם ראשונה כאן? צור חשבון חדש</Text>
                     </TouchableOpacity>
                 </KeyboardAvoidingView>
             </ScrollView>
