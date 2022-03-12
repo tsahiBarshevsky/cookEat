@@ -8,7 +8,7 @@ const Directions = ({ directions }) => {
             data={directions}
             style={{ marginTop: 5 }}
             keyExtractor={(item) => item.key}
-            contentContainerStyle={{ paddingBottom: 10, marginTop: 5 }}
+            contentContainerStyle={{ paddingBottom: 15, marginTop: 5 }}
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => {
                 return (

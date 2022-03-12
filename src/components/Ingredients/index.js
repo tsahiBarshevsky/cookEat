@@ -8,7 +8,7 @@ const Ingredients = ({ ingredients }) => {
             data={ingredients}
             style={{ marginTop: 5, flex: 1 }}
             keyExtractor={(item) => item.key}
-            contentContainerStyle={{ paddingBottom: 10, marginTop: 5 }}
+            contentContainerStyle={{ paddingBottom: 15, marginTop: 5 }}
             ItemSeparatorComponent={() => <View style={{ marginVertical: 7 }} />}
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => {
