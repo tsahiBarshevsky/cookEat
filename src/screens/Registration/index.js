@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
-import { MaterialIcons, Entypo, FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons, Entypo, FontAwesome, AntDesign } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { authentication } from '../../utils/firebase';
@@ -131,18 +131,6 @@ const RegistrationScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <ExpoStatusBar style='light' />
-            <View style={styles.header}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        activeOpacity={0.8}
-                        style={styles.headerButton}
-                    >
-                        <Entypo style={{ transform: [{ translateY: 1 }] }} name="chevron-right" size={24} color="white" />
-                    </TouchableOpacity>
-                    <Text style={styles.headerText}>חזרה להתחברות</Text>
-                </View>
-            </View>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 15 }}
@@ -151,110 +139,120 @@ const RegistrationScreen = ({ navigation }) => {
                     enabled
                     behavior={Platform.OS === 'ios' ? 'padding' : null}
                 >
-                    <View style={styles.logo}>
-                        <View style={styles.line} />
-                        <Text style={styles.logoText}>Cook Eat</Text>
-                        <View style={styles.line} />
-                    </View>
-                    <Text style={[styles.text, styles.title]}>אימייל</Text>
-                    <View style={styles.textInputWrapper}>
-                        <MaterialIcons
-                            name="alternate-email"
-                            size={20}
-                            color="white"
-                            style={styles.icon}
-                        />
-                        <TextInput
-                            value={email}
-                            placeholder='מהי כתובת המייל שלך?'
-                            onChangeText={(text) => setEmail(text)}
-                            keyboardType='email-address'
-                            placeholderTextColor={placeholder}
-                            underlineColorAndroid="transparent"
-                            selectionColor={placeholder}
-                            returnKeyType='next'
-                            onSubmitEditing={() => passwordRef.current.focus()}
-                            blurOnSubmit={false}
-                            style={styles.textInput}
-                        />
-                    </View>
-                    <Text style={[styles.text, styles.title]}>סיסמה</Text>
-                    <View style={styles.textInputWrapper}>
-                        <Entypo
-                            name="lock"
-                            size={20}
-                            color="white"
-                            style={styles.icon}
-                        />
-                        <TextInput
-                            value={password}
-                            ref={passwordRef}
-                            placeholder='חייבת להכיל 6 תווים לפחות'
-                            secureTextEntry={passwordVisibilty}
-                            onChangeText={(text) => setPassword(text)}
-                            placeholderTextColor={placeholder}
-                            underlineColorAndroid="transparent"
-                            selectionColor={placeholder}
-                            onSubmitEditing={() => onRegister()}
-                            blurOnSubmit={false}
-                            style={styles.textInput}
-                        />
-                        <TouchableOpacity onPress={() => setPasswordVisibilty(!passwordVisibilty)}>
-                            {passwordVisibilty ?
-                                <FontAwesome
-                                    name="eye"
-                                    size={20}
-                                    color="rgba(255, 255, 255, 0.75)"
-                                    style={styles.eye}
-                                />
-                                :
-                                <FontAwesome
-                                    name="eye-slash"
-                                    size={20}
-                                    color="rgba(255, 255, 255, 0.75)"
-                                    style={styles.eye}
-                                />
-                            }
-                        </TouchableOpacity>
-                    </View>
-                    <Text style={[styles.text, styles.title]}>בחירת אווטאר</Text>
-                    <FlatList
-                        data={avatars}
-                        key={(item) => item.key}
-                        horizontal
-                        contentContainerStyle={{ paddingBottom: 7 }}
-                        ItemSeparatorComponent={() => <View style={{ paddingHorizontal: 5 }} />}
-                        renderItem={({ item }) => {
-                            return (
-                                <TouchableOpacity
-                                    onPress={() => setAvatar(item.key)}
-                                    style={[
-                                        styles.avatar,
-                                        avatar === item.key ?
-                                            styles.selected
-                                            :
-                                            styles.unselected
-                                    ]}
-                                    activeOpacity={0.9}
-                                >
-                                    <Image
-                                        source={{ uri: item.url }}
-                                        style={{ height: 50, width: 50 }}
-                                        resizeMode='cover'
-                                    />
-                                </TouchableOpacity>
-                            )
-                        }}
-                    />
                     <TouchableOpacity
-                        onPress={onRegister}
-                        style={styles.button}
+                        onPress={() => navigation.goBack()}
+                        style={styles.goBack}
                         activeOpacity={0.8}
                     >
-                        <Text style={[styles.text, styles.buttonText]}>
-                            צור לי חשבון!
-                        </Text>
+                        <AntDesign name="arrowright" size={24} color="white" />
                     </TouchableOpacity>
+                    <View style={{ paddingHorizontal: 15 }}>
+                        <Image
+                            source={require('../../../assets/images/authentication2.png')}
+                            resizeMode='contain'
+                            style={styles.image}
+                        />
+                        <Text style={[styles.text, styles.route]}>יצירת חשבון</Text>
+                        <Text style={[styles.text, styles.title]}>אימייל</Text>
+                        <View style={styles.textInputWrapper}>
+                            <MaterialIcons
+                                name="alternate-email"
+                                size={20}
+                                color="white"
+                                style={styles.icon}
+                            />
+                            <TextInput
+                                value={email}
+                                placeholder='מהי כתובת המייל שלך?'
+                                onChangeText={(text) => setEmail(text)}
+                                keyboardType='email-address'
+                                placeholderTextColor={placeholder}
+                                underlineColorAndroid="transparent"
+                                selectionColor={placeholder}
+                                returnKeyType='next'
+                                onSubmitEditing={() => passwordRef.current.focus()}
+                                blurOnSubmit={false}
+                                style={styles.textInput}
+                            />
+                        </View>
+                        <Text style={[styles.text, styles.title]}>סיסמה</Text>
+                        <View style={styles.textInputWrapper}>
+                            <Entypo
+                                name="lock"
+                                size={20}
+                                color="white"
+                                style={styles.icon}
+                            />
+                            <TextInput
+                                value={password}
+                                ref={passwordRef}
+                                placeholder='חייבת להכיל 6 תווים לפחות'
+                                secureTextEntry={passwordVisibilty}
+                                onChangeText={(text) => setPassword(text)}
+                                placeholderTextColor={placeholder}
+                                underlineColorAndroid="transparent"
+                                selectionColor={placeholder}
+                                onSubmitEditing={() => onRegister()}
+                                blurOnSubmit={false}
+                                style={styles.textInput}
+                            />
+                            <TouchableOpacity onPress={() => setPasswordVisibilty(!passwordVisibilty)}>
+                                {passwordVisibilty ?
+                                    <FontAwesome
+                                        name="eye"
+                                        size={20}
+                                        color="rgba(255, 255, 255, 0.75)"
+                                        style={styles.eye}
+                                    />
+                                    :
+                                    <FontAwesome
+                                        name="eye-slash"
+                                        size={20}
+                                        color="rgba(255, 255, 255, 0.75)"
+                                        style={styles.eye}
+                                    />
+                                }
+                            </TouchableOpacity>
+                        </View>
+                        <Text style={[styles.text, styles.title]}>בחירת אווטאר</Text>
+                        <FlatList
+                            data={avatars}
+                            key={(item) => item.key}
+                            horizontal
+                            contentContainerStyle={{ paddingBottom: 7 }}
+                            ItemSeparatorComponent={() => <View style={{ paddingHorizontal: 5 }} />}
+                            renderItem={({ item }) => {
+                                return (
+                                    <TouchableOpacity
+                                        onPress={() => setAvatar(item.key)}
+                                        style={[
+                                            styles.avatar,
+                                            avatar === item.key ?
+                                                styles.selected
+                                                :
+                                                styles.unselected
+                                        ]}
+                                        activeOpacity={0.9}
+                                    >
+                                        <Image
+                                            source={{ uri: item.url }}
+                                            style={{ height: 50, width: 50 }}
+                                            resizeMode='cover'
+                                        />
+                                    </TouchableOpacity>
+                                )
+                            }}
+                        />
+                        <TouchableOpacity
+                            onPress={onRegister}
+                            style={styles.button}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={[styles.text, styles.buttonText]}>
+                                צור לי חשבון!
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </KeyboardAvoidingView>
             </ScrollView>
         </SafeAreaView>
@@ -267,24 +265,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-        backgroundColor: background,
-        paddingHorizontal: 15,
+        backgroundColor: background
     },
-    image: {
-        ...StyleSheet.absoluteFillObject,
-        opacity: 0.1
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    goBack: {
+        justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
-        height: 40
-    },
-    headerText: {
-        color: 'white',
-        fontSize: 17,
-        flexShrink: 1
+        width: 35,
+        height: 35,
     },
     text: {
         color: 'white'
@@ -293,6 +280,17 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 17,
         marginBottom: 5
+    },
+    route: {
+        fontSize: 25,
+        fontWeight: 'bold',
+        marginBottom: 10
+    },
+    image: {
+        height: 230,
+        width: 230,
+        alignSelf: 'center',
+        marginTop: -30
     },
     textInputWrapper: {
         height: 45,
@@ -346,21 +344,5 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 16,
         letterSpacing: 1
-    },
-    logo: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginVertical: 10
-    },
-    line: {
-        width: '85%',
-        height: 2,
-        borderRadius: 1,
-        backgroundColor: 'white'
-    },
-    logoText: {
-        fontFamily: 'BilboSwashCaps',
-        fontSize: 45,
-        color: 'white'
     }
 });
