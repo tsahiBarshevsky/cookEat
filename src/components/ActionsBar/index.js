@@ -57,7 +57,7 @@ const ActionsBar = ({ size }) => {
                 </TouchableOpacity>
                 <View style={[styles.wrapper, styles.image]}>
                     <Image
-                        source={require('../../../assets/images/boy.png')}
+                        source={{ uri: authentication.currentUser.photoURL }}
                         style={{ height: 30, width: 30 }}
                         resizeMode='cover'
                     />
