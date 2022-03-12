@@ -9,3 +9,4 @@ export { default as RecipeScreen } from './Recipe';
 export { default as SearchScreen } from './Search';
 export { default as FavoritesScreen } from './Favorites';
 export { default as ImagePreview } from './ImagePreview';
+export { default as ProfileScreen } from './Profile';

@@ -11,6 +11,7 @@ import {
     ImagePreview,
     InsertionScreen,
     LoginScreen,
+    ProfileScreen,
     RecipeScreen,
     RegistrationScreen,
     ResetPasswordScreen,
@@ -58,6 +59,11 @@ const AppNavigator = () => {
                         headerShown: false,
                         animationEnabled: false
                     }}
+                />
+                <Stack.Screen
+                    name='Profile'
+                    component={ProfileScreen}
+                    options={{ headerShown: false }}
                 />
                 <Stack.Screen
                     name='Recipe'

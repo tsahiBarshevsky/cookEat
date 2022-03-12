@@ -3,9 +3,10 @@ import { StyleSheet, Image, View, Text, TouchableOpacity } from 'react-native';
 import { Feather, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Modalize as BottomSheet } from 'react-native-modalize';
+import { SharedElement } from 'react-navigation-shared-element';
 import { hover, placeholder, primary, secondary } from '../../utils/palette';
 
-// firabse
+// Firebase
 import { signOut } from 'firebase/auth';
 import { authentication } from '../../utils/firebase';
 
@@ -55,13 +56,21 @@ const ActionsBar = ({ size }) => {
                         חיפוש מבין {size} מתכונים...
                     </Text>
                 </TouchableOpacity>
-                <View style={[styles.wrapper, styles.image]}>
-                    <Image
-                        source={{ uri: authentication.currentUser.photoURL }}
-                        style={{ height: 30, width: 30 }}
-                        resizeMode='cover'
-                    />
-                </View>
+                <SharedElement id='user-image-wrapper'>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('Profile')}
+                        style={[styles.wrapper, styles.image]}
+                        activeOpacity={1}
+                    >
+                        <SharedElement id='user-image'>
+                            <Image
+                                source={{ uri: authentication.currentUser.photoURL }}
+                                style={{ height: 30, width: 30 }}
+                                resizeMode='cover'
+                            />
+                        </SharedElement>
+                    </TouchableOpacity>
+                </SharedElement>
             </View>
             <BottomSheet
                 ref={bottomSheetRef}
