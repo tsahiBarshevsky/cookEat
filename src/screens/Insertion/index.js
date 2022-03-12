@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SafeAreaView, StatusBar, ScrollView, TouchableOpacity, StyleSheet, Image, Text, Platform, TextInput, View, KeyboardAvoidingView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch } from 'react-redux';
 import uuid from 'react-native-uuid';
@@ -13,6 +12,21 @@ import { addNewRecipe } from '../../redux/actions/recipes';
 import { background, primary, secondary, placeholder } from '../../utils/palette';
 import config from '../../utils/config';
 
+// React native components
+import {
+    SafeAreaView,
+    StatusBar,
+    ScrollView,
+    TouchableOpacity,
+    StyleSheet,
+    Image,
+    Text,
+    Platform,
+    TextInput,
+    View,
+    KeyboardAvoidingView
+} from 'react-native';
+
 // firebase
 import { doc, setDoc } from 'firebase/firestore/lite';
 import { authentication, db } from '../../utils/firebase';
@@ -22,7 +36,6 @@ const InsertionScreen = ({ navigation }) => {
     const [time, setTime] = useState({ value: '', unit: 'דקה' });
     const [quantity, setQuantity] = useState('');
     const [category, setCategory] = useState('');
-    const [youtube, setYoutube] = useState('');
     const [ingredients, setIngredients] = useState([{ key: uuid.v4() }]);
     const [directions, setDirections] = useState([{}]);
     const [formKey, setFormKey] = useState(0);
@@ -37,7 +50,6 @@ const InsertionScreen = ({ navigation }) => {
     const quantityRef = useRef(null);
     const categoryRef = useRef(null);
     const timeRef = useRef(null);
-    const youtubeRef = useRef(null);
     const ingredientRef = useRef(null);
     const amountRef = useRef(null);
     const unitRef = useRef(null);
@@ -134,7 +146,6 @@ const InsertionScreen = ({ navigation }) => {
             name: name,
             quantity: quantity,
             category: category,
-            youtube: youtube !== '' ? youtube : null,
             time: {
                 value: time.value,
                 unit: time.value > 1 ? (time.unit === 'דקה' ? 'דקות' : 'שעות') : (time.unit === 'דקה' ? 'דקה' : 'שעה')
@@ -175,6 +186,16 @@ const InsertionScreen = ({ navigation }) => {
             };
             handleAddDocument(newRecipe);
         }
+    }
+
+    const clearForm = () => {
+        setName('');
+        setQuantity('');
+        setCategory('');
+        setTime({ value: '', unit: 'דקה' });
+        setIngredients([{}]);
+        setDirections([{}]);
+        setFormKey(Math.random());
     }
 
     useEffect(() => {
@@ -289,7 +310,7 @@ const InsertionScreen = ({ navigation }) => {
                                 underlineColorAndroid="transparent"
                                 selectionColor={placeholder}
                                 returnKeyType='next'
-                                onSubmitEditing={() => youtubeRef.current.focus()}
+                                onSubmitEditing={() => ingredientRef.current.focus()}
                                 blurOnSubmit={false}
                             />
                             <RadioForm
@@ -310,22 +331,6 @@ const InsertionScreen = ({ navigation }) => {
                                 style={styles.radioForm}
                             />
                         </View>
-                    </View>
-                    <View style={styles.textInputWrapper}>
-                        <Text style={styles.label}>לינק לסרטון</Text>
-                        <TextInput
-                            value={youtube}
-                            ref={youtubeRef}
-                            placeholder='אם יש סרטון, הכנס אותו כאן'
-                            onChangeText={(text) => setYoutube(text)}
-                            style={styles.textInput}
-                            placeholderTextColor={placeholder}
-                            underlineColorAndroid="transparent"
-                            selectionColor={placeholder}
-                            returnKeyType='next'
-                            onSubmitEditing={() => ingredientRef.current.focus()}
-                            blurOnSubmit={false}
-                        />
                     </View>
                     <Text style={[styles.text, styles.title]}>מרכיבים</Text>
                     {ingredients.map((ingredient, index) => (
@@ -443,18 +448,28 @@ const InsertionScreen = ({ navigation }) => {
                             }
                         </View>
                     ))}
-                    <TouchableOpacity
-                        onPress={onAddNewRecipe}
-                        style={styles.button}
-                        activeOpacity={0.8}
-                        disabled={disabled}
-                    >
-                        {!disabled ?
-                            <Text style={styles.text}>הוספה</Text>
-                            :
-                            <UIActivityIndicator size={25} count={12} color='white' />
-                        }
-                    </TouchableOpacity>
+                    <View style={styles.buttons}>
+                        <TouchableOpacity
+                            onPress={onAddNewRecipe}
+                            style={[styles.button, styles.add]}
+                            activeOpacity={0.8}
+                            disabled={disabled}
+                        >
+                            {!disabled ?
+                                <Text style={styles.text}>הוספה</Text>
+                                :
+                                <UIActivityIndicator size={25} count={12} color='white' />
+                            }
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => clearForm()}
+                            style={[styles.button, styles.clear]}
+                            activeOpacity={0.8}
+                            disabled={disabled}
+                        >
+                            <Text style={styles.text}>ניקוי</Text>
+                        </TouchableOpacity>
+                    </View>
                 </KeyboardAvoidingView>
             </ScrollView>
         </SafeAreaView>
@@ -519,11 +534,9 @@ const styles = StyleSheet.create({
         paddingVertical: 5
     },
     label: {
-        // // fontFamily: 'Alef',
         color: 'white'
     },
     textInput: {
-        // // fontFamily: 'Alef',
         fontSize: 16,
         color: 'white',
         textAlign: 'right',
@@ -538,7 +551,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     text: {
-        // // fontFamily: 'AlefBold',
         color: 'white',
         fontSize: 17,
         letterSpacing: 1.2
@@ -561,17 +573,30 @@ const styles = StyleSheet.create({
     radioForm: {
         marginLeft: 15,
     },
+    buttons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 10
+    },
     button: {
-        backgroundColor: secondary,
         borderRadius: 15,
-        height: 40,
+        height: 35,
+        width: 100,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 10,
-        elevation: 1
+        elevation: 2
+    },
+    add: {
+        backgroundColor: secondary,
+    },
+    clear: {
+        borderColor: secondary,
+        borderWidth: 1
     },
     title: {
         fontSize: 20,
+        fontWeight: 'bold',
         color: 'white',
         marginVertical: 10
     }

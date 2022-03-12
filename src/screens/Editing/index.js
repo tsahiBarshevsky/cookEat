@@ -1,15 +1,29 @@
 import React, { useState, useRef } from 'react';
-import { SafeAreaView, ScrollView, Image, TouchableOpacity, StyleSheet, Text, Platform, StatusBar, TextInput, View, KeyboardAvoidingView } from 'react-native';
 import { useDispatch } from 'react-redux';
 import uuid from 'react-native-uuid';
 import RadioForm from 'react-native-simple-radio-button';
-import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
+import { AntDesign, Entypo } from '@expo/vector-icons';
 import update from 'immutability-helper';
 import { SharedElement } from 'react-navigation-shared-element';
 import Toast from 'react-native-toast-message';
 import { useSelector } from 'react-redux';
 import { editRecipe } from '../../redux/actions/recipes';
 import { background, primary, secondary, placeholder } from '../../utils/palette';
+
+// React native components
+import {
+    SafeAreaView,
+    ScrollView,
+    Image,
+    TouchableOpacity,
+    StyleSheet,
+    Text,
+    Platform,
+    StatusBar,
+    TextInput,
+    View,
+    KeyboardAvoidingView
+} from 'react-native';
 
 // firebase
 import { doc, updateDoc } from 'firebase/firestore/lite';
@@ -22,7 +36,6 @@ const EditingScreen = ({ route, navigation }) => {
     const [time, setTime] = useState(item.time);
     const [quantity, setQuantity] = useState(item.quantity);
     const [category, setCategory] = useState(item.category);
-    const [youtube, setYoutube] = useState(item.youtube);
     const [ingredients, setIngredients] = useState(item.ingredients);
     const [directions, setDirections] = useState(item.directions);
     const dispatch = useDispatch();
@@ -34,7 +47,6 @@ const EditingScreen = ({ route, navigation }) => {
     const quantityRef = useRef(null);
     const categoryRef = useRef(null);
     const timeRef = useRef(null);
-    const youtubeRef = useRef(null);
     const ingredientRef = useRef(null);
     const amountRef = useRef(null);
     const unitRef = useRef(null);
@@ -94,7 +106,6 @@ const EditingScreen = ({ route, navigation }) => {
             name: name,
             quantity: quantity,
             category: category,
-            youtube: youtube !== '' ? youtube : null,
             time: {
                 value: time.value,
                 unit: time.value > 1 ? (time.unit === 'דקה' ? 'דקות' : 'שעות') : (time.unit === 'דקה' ? 'דקה' : 'שעה')
@@ -109,7 +120,6 @@ const EditingScreen = ({ route, navigation }) => {
                 name: editedRecipe.name,
                 quantity: editedRecipe.quantity,
                 category: editedRecipe.category,
-                youtube: editedRecipe.youtube,
                 time: {
                     unit: editedRecipe.time.unit,
                     value: editedRecipe.time.value
@@ -238,7 +248,7 @@ const EditingScreen = ({ route, navigation }) => {
                                 underlineColorAndroid="transparent"
                                 selectionColor={placeholder}
                                 returnKeyType='next'
-                                onSubmitEditing={() => youtubeRef.current.focus()}
+                                onSubmitEditing={() => ingredientRef.current.focus()}
                                 blurOnSubmit={false}
                             />
                             <RadioForm
@@ -258,22 +268,6 @@ const EditingScreen = ({ route, navigation }) => {
                                 style={styles.radioForm}
                             />
                         </View>
-                    </View>
-                    <View style={styles.textInputWrapper}>
-                        <Text style={styles.label}>לינק לסרטון</Text>
-                        <TextInput
-                            value={youtube}
-                            ref={youtubeRef}
-                            placeholder='אם יש סרטון, הכנס אותו כאן'
-                            onChangeText={(text) => setYoutube(text)}
-                            style={styles.textInput}
-                            placeholderTextColor={placeholder}
-                            underlineColorAndroid="transparent"
-                            selectionColor={placeholder}
-                            returnKeyType='next'
-                            onSubmitEditing={() => ingredientRef.current.focus()}
-                            blurOnSubmit={false}
-                        />
                     </View>
                     <Text style={[styles.text, styles.title]}>מרכיבים</Text>
                     {ingredients.map((ingredient, index) => (
@@ -504,7 +498,8 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 20,
+        fontWeight: 'bold',
         color: 'white',
-        marginBottom: 5
+        marginVertical: 10
     }
 });
