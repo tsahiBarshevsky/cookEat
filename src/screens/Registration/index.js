@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { MaterialIcons, Entypo, FontAwesome, AntDesign } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
+import { UIActivityIndicator } from 'react-native-indicators';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { authentication } from '../../utils/firebase';
 import { background, primary, secondary, placeholder, selected } from '../../utils/palette';
@@ -24,6 +25,7 @@ import {
 } from 'react-native';
 
 const RegistrationScreen = ({ navigation }) => {
+    const [disabled, setDisabled] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordVisibilty, setPasswordVisibilty] = useState(true);
@@ -31,6 +33,8 @@ const RegistrationScreen = ({ navigation }) => {
     const passwordRef = useRef(null);
 
     const notify = (message) => {
+        console.log(message);
+        setDisabled(false);
         switch (message) {
             case 'Firebase: Password should be at least 6 characters (auth/weak-password).':
                 Toast.show({
@@ -110,6 +114,7 @@ const RegistrationScreen = ({ navigation }) => {
     }
 
     const onRegister = () => {
+        setDisabled(true);
         createUserWithEmailAndPassword(authentication, email, password)
             .then(() => {
                 updateProfile(
@@ -247,10 +252,15 @@ const RegistrationScreen = ({ navigation }) => {
                             onPress={onRegister}
                             style={styles.button}
                             activeOpacity={0.8}
+                            disabled={disabled}
                         >
-                            <Text style={[styles.text, styles.buttonText]}>
-                                צור לי חשבון!
-                            </Text>
+                            {disabled ?
+                                <UIActivityIndicator size={25} count={12} color='white' />
+                                :
+                                <Text style={[styles.text, styles.buttonText]}>
+                                    צור לי חשבון!
+                                </Text>
+                            }
                         </TouchableOpacity>
                     </View>
                 </KeyboardAvoidingView>

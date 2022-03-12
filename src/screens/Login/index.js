@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { MaterialIcons, Entypo, FontAwesome } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
+import { BallIndicator, UIActivityIndicator } from 'react-native-indicators';
 import { authentication } from '../../utils/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { background, primary, secondary, placeholder, selected } from '../../utils/palette';
@@ -19,16 +20,20 @@ import {
     Image,
     Text,
     TouchableOpacity,
+    Keyboard
 } from 'react-native';
 
 const LoginScreen = ({ navigation }) => {
+    const [loaded, setLoaded] = useState(false);
+    const [disabled, setDisabled] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordVisibilty, setPasswordVisibilty] = useState(true);
     const passwordRef = useRef(null);
 
     const notify = (message) => {
-        console.log(message)
+        console.log(message);
+        setDisabled(false);
         switch (message) {
             case 'Firebase: Password should be at least 6 characters (auth/weak-password).':
                 Toast.show({
@@ -120,6 +125,7 @@ const LoginScreen = ({ navigation }) => {
     }
 
     const onSignIn = () => {
+        setDisabled(true);
         signInWithEmailAndPassword(authentication, email, password)
             .then(() => navigation.replace('Splash'))
             .catch((error) => notify(error.message));
@@ -129,11 +135,15 @@ const LoginScreen = ({ navigation }) => {
         const unsubscribe = authentication.onAuthStateChanged((user) => {
             if (user)
                 navigation.replace('Splash');
+            else
+                setTimeout(() => {
+                    setLoaded(true);
+                }, 1000);
         });
         return unsubscribe;
     }, []);
 
-    return (
+    return loaded ? (
         <SafeAreaView style={styles.container}>
             <ExpoStatusBar style='light' />
             <ScrollView
@@ -190,7 +200,6 @@ const LoginScreen = ({ navigation }) => {
                             underlineColorAndroid="transparent"
                             selectionColor={placeholder}
                             onSubmitEditing={() => onSignIn()}
-                            blurOnSubmit={false}
                             style={styles.textInput}
                         />
                         <TouchableOpacity onPress={() => setPasswordVisibilty(!passwordVisibilty)}>
@@ -221,10 +230,15 @@ const LoginScreen = ({ navigation }) => {
                         onPress={onSignIn}
                         style={styles.button}
                         activeOpacity={0.8}
+                        disabled={disabled}
                     >
-                        <Text style={[styles.text, styles.buttonText]}>
-                            התחברות
-                        </Text>
+                        {disabled ?
+                            <UIActivityIndicator size={25} count={12} color='white' />
+                            :
+                            <Text style={[styles.text, styles.buttonText]}>
+                                התחברות
+                            </Text>
+                        }
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('Registration')}
@@ -236,6 +250,11 @@ const LoginScreen = ({ navigation }) => {
                 </KeyboardAvoidingView>
             </ScrollView>
         </SafeAreaView>
+    ) : (
+        <SafeAreaView style={styles.loadingContainer}>
+            <ExpoStatusBar style='light' />
+            <BallIndicator size={30} count={8} color='white' />
+        </SafeAreaView>
     )
 }
 
@@ -246,7 +265,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
         backgroundColor: background,
-        paddingHorizontal: 15,
+        paddingHorizontal: 15
     },
     header: {
         flexDirection: 'row',
@@ -338,5 +357,11 @@ const styles = StyleSheet.create({
     registration: {
         marginTop: 10,
         alignSelf: 'center'
+    },
+    loadingContainer: {
+        flex: 1,
+        backgroundColor: background,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
