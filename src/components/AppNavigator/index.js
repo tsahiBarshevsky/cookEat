@@ -12,6 +12,7 @@ import {
     LoginScreen,
     RecipeScreen,
     RegistrationScreen,
+    ResetPasswordScreen,
     SearchScreen,
     SplashScreen
 } from '../../screens';
@@ -30,6 +31,11 @@ const AppNavigator = () => {
                 <Stack.Screen
                     name='Login'
                     component={LoginScreen}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name='ResetPassword'
+                    component={ResetPasswordScreen}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen

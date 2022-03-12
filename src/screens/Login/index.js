@@ -221,6 +221,7 @@ const LoginScreen = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
                     <TouchableOpacity
+                        onPress={() => navigation.navigate('ResetPassword')}
                         style={styles.password}
                         activeOpacity={1}
                     >
