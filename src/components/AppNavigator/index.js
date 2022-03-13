@@ -18,6 +18,7 @@ import {
     SearchScreen,
     SplashScreen
 } from '../../screens';
+import TempScreen from '../../screens/Temp';
 
 const Stack = createSharedElementStackNavigator();
 const theme = {
@@ -99,6 +100,12 @@ const AppNavigator = () => {
                 <Stack.Screen
                     name='Editing'
                     component={EditingScreen}
+                    options={{ headerShown: false }}
+                />
+
+                <Stack.Screen
+                    name='Temp'
+                    component={TempScreen}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
