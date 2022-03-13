@@ -84,18 +84,10 @@ const ActionsBar = ({ size }) => {
                 handlePosition='inside'
                 modalStyle={styles.modalStyle}
                 handleStyle={styles.handleStyle}
-                openAnimationConfig={{ timing: { duration: 500 } }}
+                openAnimationConfig={{ timing: { duration: 200 } }}
                 closeAnimationConfig={{ timing: { duration: 500 } }}
             >
                 <View style={styles.bottomSheetContainer}>
-                    <View style={styles.emailWrapper}>
-                        <Text style={[styles.text, styles.email]}>
-                            {authentication.currentUser.email}
-                        </Text>
-                    </View>
-                    <View style={{ paddingHorizontal: 15 }}>
-                        <View style={styles.seperator} />
-                    </View>
                     <View style={styles.item}>
                         <TouchableOpacity
                             onPress={() => onNavigate('Insertion')}
@@ -161,13 +153,14 @@ const styles = StyleSheet.create({
         elevation: 2
     },
     bottomSheetContainer: {
-        height: 220,
-        paddingTop: 25
+        height: '100%',
+        paddingTop: 20,
+        paddingBottom: 5
     },
     modalStyle: {
         backgroundColor: primary,
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30
+        borderTopLeftRadius: 25,
+        borderTopRightRadius: 25
     },
     handleStyle: {
         backgroundColor: 'white',

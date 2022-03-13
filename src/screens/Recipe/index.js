@@ -108,7 +108,7 @@ const RecipeScreen = ({ route, navigation }) => {
                 <View style={styles.recipe}>
                     <View style={{ alignItems: 'center', padding: 15 }}>
                         <Animatable.Text
-                            animation='bounceIn'
+                            animation='fadeInRight'
                             delay={DURATION}
                             style={styles.name}
                         >
