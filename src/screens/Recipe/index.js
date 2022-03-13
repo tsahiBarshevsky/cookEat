@@ -107,12 +107,18 @@ const RecipeScreen = ({ route, navigation }) => {
             <SharedElement id={`${item.id}.details.${origin}`} style={{ flex: 1 }}>
                 <View style={styles.recipe}>
                     <View style={{ alignItems: 'center', padding: 15 }}>
-                        <Text style={styles.name}>{item.name}</Text>
+                        <Animatable.Text
+                            animation='bounceIn'
+                            delay={DURATION}
+                            style={styles.name}
+                        >
+                            {item.name}
+                        </Animatable.Text>
                     </View>
                     <View style={styles.details}>
                         <Animatable.View
                             animation='bounceIn'
-                            delay={DURATION}
+                            delay={DURATION + 100}
                         >
                             <Detail
                                 type={'time'}
@@ -122,7 +128,7 @@ const RecipeScreen = ({ route, navigation }) => {
                         <View style={styles.seperator} />
                         <Animatable.View
                             animation='bounceIn'
-                            delay={DURATION + 200}
+                            delay={DURATION + 300}
                         >
                             <Detail
                                 type={'quantity'}
@@ -132,7 +138,7 @@ const RecipeScreen = ({ route, navigation }) => {
                         <View style={styles.seperator} />
                         <Animatable.View
                             animation='bounceIn'
-                            delay={DURATION + 400}
+                            delay={DURATION + 500}
                         >
                             <Detail
                                 type={'category'}

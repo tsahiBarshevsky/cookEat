@@ -63,7 +63,10 @@ const SearchScreen = ({ route }) => {
                     placeholderTextColor={placeholder}
                     selectionColor={placeholder}
                     underlineColorAndroid="transparent"
-                    onChangeText={(text) => setKeyword(text)}
+                    onChangeText={(text) => {
+                        setKeyword(text);
+                        setIsSearched(false);
+                    }}
                     returnKeyType='search'
                     onSubmitEditing={() => handleSearch(keyword)}
                 />
