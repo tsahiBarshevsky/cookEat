@@ -66,7 +66,10 @@ const AppNavigator = () => {
                 <Stack.Screen
                     name='Profile'
                     component={ProfileScreen}
-                    options={{ headerShown: false }}
+                    options={{
+                        headerShown: false,
+                        presentation: 'transparentModal'
+                    }}
                 />
                 <Stack.Screen
                     name='Recipe'

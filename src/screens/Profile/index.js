@@ -1,10 +1,11 @@
 import React from 'react';
-import { StyleSheet, Platform, StatusBar, TouchableOpacity, SafeAreaView, View, Image } from 'react-native';
+import { StyleSheet, Platform, StatusBar, SafeAreaView, View, Image } from 'react-native';
+import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { SharedElement } from 'react-navigation-shared-element';
 import Moment from 'moment';
 import { useSelector } from 'react-redux';
 import * as Animatable from 'react-native-animatable';
-import { Ionicons } from '@expo/vector-icons';
+import TouchableScale from 'react-native-touchable-scale';
 import { background, secondary } from '../../utils/palette';
 
 // Firebase
@@ -17,70 +18,69 @@ const ProfileScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Animatable.View
-                animation='zoomIn'
-                delay={250}
-                style={[styles.floatingButton, styles.close]}
-            >
-                <TouchableOpacity
+            <ExpoStatusBar style='light' backgroundColor={background} />
+            <View style={styles.content}>
+                <TouchableScale
+                    activeScale={0.95}
+                    tension={50}
+                    friction={7}
+                    useNativeDriver
                     onPress={() => navigation.goBack()}
-                    style={styles.floatingButtonInner}
-                    activeOpacity={0.8}
                 >
-                    <Ionicons name="chevron-back" size={25} color="white" />
-                </TouchableOpacity>
-            </Animatable.View>
-            <SharedElement id='user-image-wrapper'>
-                <View style={styles.wrapper}>
-                </View>
-            </SharedElement>
-            <SharedElement id='user-image'>
-                <Image
-                    source={{ uri: authentication.currentUser.photoURL }}
-                    resizeMode='cover'
-                    style={styles.image}
-                />
-            </SharedElement>
-            <Animatable.Text
-                animation='fadeInUp'
-                delay={DURATION}
-                style={[styles.text, styles.email]}
-            >
-                {authentication.currentUser.email}
-            </Animatable.Text>
-            {recipes.length > 1 ?
-                <View style={styles.recipesWrapper}>
+                    <SharedElement id='user-image-wrapper'>
+                        <View style={styles.wrapper} />
+                    </SharedElement>
+                    <SharedElement id='user-image'>
+                        <Image
+                            source={{ uri: authentication.currentUser.photoURL }}
+                            resizeMode='cover'
+                            style={styles.image}
+                        />
+                    </SharedElement>
+                </TouchableScale>
+                <View style={{ alignItems: 'flex-start' }}>
                     <Animatable.Text
-                        animation='fadeInUp'
-                        delay={DURATION + 100}
+                        animation='fadeInRight'
+                        delay={DURATION}
+                        style={[styles.text, styles.email]}
+                    >
+                        {authentication.currentUser.email}
+                    </Animatable.Text>
+                    {recipes.length > 1 ?
+                        <View style={styles.recipesWrapper}>
+                            <Animatable.Text
+                                animation='fadeInRight'
+                                delay={DURATION + 100}
+                                style={styles.text}
+                            >
+                                הוספת {recipes.length} מתכונים
+                            </Animatable.Text>
+                            <Animatable.Text
+                                animation='fadeInRight'
+                                delay={DURATION + 200}
+                                style={styles.text}
+                            >
+                                ב-{[...new Set(recipes.map(recipe => recipe.category))].length} קטגוריות שונות
+                            </Animatable.Text>
+                        </View>
+                        :
+                        <Animatable.Text
+                            animation='fadeInRight'
+                            delay={DURATION + 100}
+                            style={styles.text}
+                        >
+                            הוספת מתכון אחד
+                        </Animatable.Text>
+                    }
+                    <Animatable.Text
+                        animation='fadeInRight'
+                        delay={DURATION + 300}
                         style={styles.text}
                     >
-                        הוספת {recipes.length} מתכונים
-                    </Animatable.Text>
-                    <Animatable.Text
-                        animation='fadeInUp'
-                        delay={DURATION + 200}
-                        style={styles.text}
-                    >
-                        ב-{[...new Set(recipes.map(recipe => recipe.category))].length} קטגוריות שונות
+                        נרשמת בתאריך {new Moment(authentication.currentUser.metadata.creationTime).format('DD/MM/YY')}
                     </Animatable.Text>
                 </View>
-                :
-                <Animatable.Text
-                    animation='fadeInUp'
-                    delay={DURATION + 100}
-                    style={styles.text}
-                >
-                    הוספת מתכון אחד
-                </Animatable.Text>
-            }
-            <Animatable.Text
-                animation='fadeInUp'
-                delay={DURATION + 300}
-                style={styles.text}
-            >
-                נרשמת בתאריך {new Moment(authentication.currentUser.metadata.creationTime).format('DD/MM/YY')}
-            </Animatable.Text>
+            </View>
         </SafeAreaView>
     )
 }
@@ -105,33 +105,24 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: background
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
+    },
+    content: {
+        flexDirection: 'row-reverse',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        paddingHorizontal: 15,
+        paddingVertical: 20,
+        backgroundColor: background,
+        borderBottomColor: secondary,
+        borderBottomWidth: 0.5
     },
     text: {
         color: 'white',
-        textAlign: 'center'
-    },
-    floatingButton: {
-        position: 'absolute',
-        justifyContent: 'center',
-        alignItems: 'center',
-        top: StatusBar.currentHeight + 5,
-        //backgroundColor: fadedBackground,
-        width: 35,
-        height: 35,
-        borderRadius: 13,
-    },
-    floatingButtonInner: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%',
-        height: '100%',
-        borderRadius: 13
-    },
-    close: {
-        right: 5
+        flexShrink: 1
     },
     wrapper: {
         width: 110,
@@ -139,22 +130,21 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 20,
-        backgroundColor: secondary,
-        marginBottom: 10
+        backgroundColor: secondary
     },
     image: {
         height: 100,
         width: 100,
         position: 'absolute',
         alignSelf: 'center',
-        transform: [{ translateY: -115 }]
+        transform: [{ translateY: -105 }]
     },
     email: {
         fontSize: 18,
         fontWeight: 'bold'
     },
     recipesWrapper: {
-        alignItems: 'center',
+        alignItems: 'flex-start',
         marginVertical: 5
     }
 });

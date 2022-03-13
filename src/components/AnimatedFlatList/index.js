@@ -14,7 +14,7 @@ const AnimatedFlatList = ({ recipes, origin }) => {
                 [{ nativeEvent: { contentOffset: { y: scorllY } } }],
                 { useNativeDriver: true }
             )}
-            style={{ marginTop: 10 }}
+            style={{ marginTop: 10, marginBottom: 5 }}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.contentContainerStyle}
             ItemSeparatorComponent={() => <View style={styles.sperator} />}

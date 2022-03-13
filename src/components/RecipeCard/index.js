@@ -54,7 +54,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: primary,
-        padding: 7,
+        paddingHorizontal: 10,
+        paddingTop: 10,
+        paddingBottom: 5,
         elevation: 3,
         marginBottom: 10,
         borderRadius: 15,
@@ -81,7 +83,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginTop: 10,
-        marginBottom: 15
+        marginBottom: 7
     },
     category: {
         backgroundColor: secondary,
