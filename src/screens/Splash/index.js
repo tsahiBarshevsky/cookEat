@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Platform, StatusBar, Text, SafeAreaView } from 'react-native';
+import { StyleSheet, SafeAreaView } from 'react-native';
+import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { useDispatch } from 'react-redux';
 import { BallIndicator } from 'react-native-indicators';
 import { getRecentSearchTerms } from '../../utils/AsyncStorageHandler';
@@ -54,6 +55,7 @@ const SplashScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <ExpoStatusBar style='light' />
             <BallIndicator size={30} count={8} color='white' />
         </SafeAreaView>
     )
@@ -64,7 +66,7 @@ export default SplashScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+        //paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
         backgroundColor: background,
         justifyContent: 'center',
         alignItems: 'center'
