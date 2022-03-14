@@ -7,7 +7,7 @@ const Ingredients = ({ ingredients }) => {
         <FlatList
             data={ingredients}
             style={{ marginTop: 5, flex: 1 }}
-            keyExtractor={(item) => item.key}
+            keyExtractor={(item) => item}
             contentContainerStyle={{ paddingBottom: 15, marginTop: 5 }}
             ItemSeparatorComponent={() => <View style={{ marginVertical: 7 }} />}
             showsVerticalScrollIndicator={false}

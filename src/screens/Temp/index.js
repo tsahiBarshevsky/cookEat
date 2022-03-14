@@ -4,14 +4,13 @@ import { useDispatch } from 'react-redux';
 import uuid from 'react-native-uuid';
 import RadioForm from 'react-native-simple-radio-button';
 import { AntDesign, Entypo, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
-import update from 'immutability-helper';
 import { UIActivityIndicator } from 'react-native-indicators';
 import { SharedElement } from 'react-navigation-shared-element';
 import { Formik, FieldArray, ErrorMessage, getIn } from 'formik';
 import Toast from 'react-native-toast-message';
 import { addNewRecipe } from '../../redux/actions/recipes';
 import { recipeSchema } from '../../utils/recipeSchema';
-import { background, primary, secondary, placeholder } from '../../utils/palette';
+import { background, primary, secondary, placeholder, error } from '../../utils/palette';
 import config from '../../utils/config';
 
 // React native components
@@ -37,6 +36,9 @@ const TempScreen = ({ navigation }) => {
     const [image, setImage] = useState(null);
     const [formKey, setFormKey] = useState(0);
     const [disabled, setDisabled] = useState(false);
+    const dispatch = useDispatch();
+
+    const origin = 'Insertion';
 
     // References for next textInput
     const nameRef = useRef(null);
@@ -48,9 +50,82 @@ const TempScreen = ({ navigation }) => {
     const unitRef = useRef(null);
     const directionRef = useRef(null);
 
-    const onAddNewRecipe = async (newRecipe) => {
-        console.log("directions:", newRecipe.directions);
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            quality: 1,
+        });
+        if (!result.cancelled)
+            setImage(result.uri);
     }
+
+    const handleAddDocument = async (newRecipe) => {
+        try {
+            await setDoc(doc(db, 'recipes', newRecipe.id), newRecipe); // Add new doc
+        }
+        catch (error) {
+            console.log(error.message);
+        }
+        finally {
+            dispatch(addNewRecipe(newRecipe)); // Update store
+            navigation.navigate('Home');
+            Toast.show({
+                type: 'recipeToast',
+                position: 'bottom',
+                bottomOffset: 20,
+                props: {
+                    message: 'המתכון נוסף בהצלחה',
+                    image: newRecipe.image.url
+                }
+            });
+        }
+    }
+
+    const onAddNewRecipe = async (newRecipe) => {
+        setDisabled(true);
+        // Generate new recipe constant data
+        newRecipe.id = uuid.v4();
+        newRecipe.owner = authentication.currentUser.email;
+        newRecipe.created = new Date();
+        newRecipe.favorite = false;
+        // Check if the user has uploaded an image
+        if (image) {
+            const newFile = {
+                uri: image,
+                type: `test/${image.split(".")[1]}`,
+                name: `test.${image.split(".")[1]}`
+            }
+            const data = new FormData();
+            data.append('file', newFile);
+            data.append('upload_preset', 'cookEat');
+            data.append('cloud_name', config.CLOUDINARY_KEY);
+            fetch(`https://api.cloudinary.com/v1_1/${config.CLOUDINARY_KEY}/image/upload`, {
+                method: 'POST',
+                body: data
+            })
+                .then(res => res.json())
+                .then(data => {
+                    newRecipe.image = {
+                        url: data.url,
+                        public_id: data.public_id
+                    };
+                    handleAddDocument(newRecipe);
+                })
+                .catch((error) => console.log("error on upload image:", error.message));
+        }
+        else {
+            newRecipe.image = {
+                url: 'https://res.cloudinary.com/ddofzlgdu/image/upload/v1647108359/pexels-curtis-adams-10099256_dgyisj.jpg',
+                public_id: null
+            };
+            handleAddDocument(newRecipe);
+        }
+    }
+
+    useEffect(() => {
+        nameRef.current?.focus();
+    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -95,13 +170,12 @@ const TempScreen = ({ navigation }) => {
                     behavior={Platform.OS === 'ios' ? 'padding' : null}
                 >
                     <Formik
-                        initialValues={{ name: '', quantity: '', category: '', time: { value: '', unit: 'דקה' }, ingredients: [{ title: '', amount: '', unit: '' }], directions: [''] }}
+                        initialValues={initialValues}
                         enableReinitialize
                         onSubmit={(values) => onAddNewRecipe(values)}
                         validationSchema={recipeSchema}
                     >
                         {({ handleChange, handleSubmit, handleBlur, values, errors, setErrors, touched, resetForm }) => {
-                            // console.log("errors:", errors.ingredients)
                             return (
                                 <View>
                                     <View style={[styles.textInputWrapper, { marginTop: 0 }]}>
@@ -121,7 +195,17 @@ const TempScreen = ({ navigation }) => {
                                             onBlur={handleBlur('name')}
                                         />
                                     </View>
-                                    {touched.name && errors.name && <Text style={styles.error}>{errors.name}</Text>}
+                                    <ErrorMessage
+                                        name='name'
+                                        render={(message) => {
+                                            return (
+                                                <View style={styles.errorContainer}>
+                                                    <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                    <Text style={styles.error}>{message}</Text>
+                                                </View>
+                                            )
+                                        }}
+                                    />
                                     <View style={styles.textInputWrapper}>
                                         <Text style={styles.label}>כמות מנות</Text>
                                         <TextInput
@@ -140,7 +224,17 @@ const TempScreen = ({ navigation }) => {
                                             onBlur={handleBlur('quantity')}
                                         />
                                     </View>
-                                    {touched.quantity && errors.quantity && <Text style={styles.error}>{errors.quantity}</Text>}
+                                    <ErrorMessage
+                                        name='quantity'
+                                        render={(message) => {
+                                            return (
+                                                <View style={styles.errorContainer}>
+                                                    <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                    <Text style={styles.error}>{message}</Text>
+                                                </View>
+                                            )
+                                        }}
+                                    />
                                     <View style={styles.textInputWrapper}>
                                         <Text style={styles.label}>קטגוריה</Text>
                                         <TextInput
@@ -158,7 +252,17 @@ const TempScreen = ({ navigation }) => {
                                             onBlur={handleBlur('category')}
                                         />
                                     </View>
-                                    {touched.category && errors.category && <Text style={styles.error}>{errors.category}</Text>}
+                                    <ErrorMessage
+                                        name='category'
+                                        render={(message) => {
+                                            return (
+                                                <View style={styles.errorContainer}>
+                                                    <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                    <Text style={styles.error}>{message}</Text>
+                                                </View>
+                                            )
+                                        }}
+                                    />
                                     <View style={[styles.textInputWrapper, { paddingRight: 3 }]}>
                                         <Text style={styles.label}>זמן הכנה</Text>
                                         <View style={styles.timeWrapper}>
@@ -193,7 +297,17 @@ const TempScreen = ({ navigation }) => {
                                             />
                                         </View>
                                     </View>
-                                    {touched.time && errors.time && <Text style={styles.error}>{errors.time.value}</Text>}
+                                    <ErrorMessage
+                                        name='time.value'
+                                        render={(message) => {
+                                            return (
+                                                <View style={styles.errorContainer}>
+                                                    <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                    <Text style={styles.error}>{message}</Text>
+                                                </View>
+                                            )
+                                        }}
+                                    />
                                     <Text style={[styles.text, styles.title]}>מרכיבים</Text>
                                     <FieldArray
                                         name='ingredients'
@@ -201,14 +315,6 @@ const TempScreen = ({ navigation }) => {
                                             const ingredients = values.ingredients;
                                             return (
                                                 ingredients.map((ingredient, index) => {
-                                                    if (errors.ingredients)
-                                                        console.log(index, errors.ingredients[index])
-                                                    // if (errors.ingredients)
-                                                    //     if (errors.ingredients[index].includes(undefined))
-                                                    //         // console.log(`ingredients[${index}]`, errors.ingredients[index].title);
-                                                    //         console.log('yes')
-                                                    //     else
-                                                    //         console.log('no')
                                                     return (
                                                         <View key={index}>
                                                             <View style={styles.dynamicInputWrapper}>
@@ -285,39 +391,44 @@ const TempScreen = ({ navigation }) => {
                                                                 }
                                                             </View>
                                                             {touched.ingredients && errors.ingredients && errors.ingredients[index] &&
-                                                                // <Text style={styles.error}>
                                                                 <ErrorMessage
                                                                     name={`ingredients.${index}.title`}
-                                                                    render={msg => <Text style={styles.error}>{msg}</Text>}
+                                                                    render={(message) => {
+                                                                        return (
+                                                                            <View style={styles.errorContainer}>
+                                                                                <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                                                <Text style={styles.error}>{message}</Text>
+                                                                            </View>
+                                                                        )
+                                                                    }}
                                                                 />
-                                                                // </Text>
                                                             }
                                                             {touched.ingredients && errors.ingredients && errors.ingredients[index] &&
-                                                                // <Text style={styles.error}>
                                                                 <ErrorMessage
                                                                     name={`ingredients.${index}.amount`}
-                                                                    render={msg => <Text style={styles.error}>{msg}</Text>}
+                                                                    render={(message) => {
+                                                                        return (
+                                                                            <View style={styles.errorContainer}>
+                                                                                <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                                                <Text style={styles.error}>{message}</Text>
+                                                                            </View>
+                                                                        )
+                                                                    }}
                                                                 />
-                                                                // </Text>
                                                             }
                                                             {touched.ingredients && errors.ingredients && errors.ingredients[index] &&
-                                                                // <Text style={styles.error}>
                                                                 <ErrorMessage
                                                                     name={`ingredients.${index}.unit`}
-                                                                    render={msg => <Text style={styles.error}>{msg}</Text>}
+                                                                    render={(message) => {
+                                                                        return (
+                                                                            <View style={styles.errorContainer}>
+                                                                                <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                                                <Text style={styles.error}>{message}</Text>
+                                                                            </View>
+                                                                        )
+                                                                    }}
                                                                 />
-                                                                // </Text>
                                                             }
-                                                            {/* {touched.ingredients && errors.ingredients &&
-                                                        <Text style={styles.error}>
-                                                            <ErrorMessage name={`ingredients.${index}.amount`} />
-                                                        </Text>
-                                                    }
-                                                    {touched.ingredients && errors.ingredients &&
-                                                        <Text style={styles.error}>
-                                                            <ErrorMessage name={`ingredients.${index}.unit`} />
-                                                        </Text>
-                                                    } */}
                                                         </View>
                                                     )
                                                 })
@@ -374,18 +485,18 @@ const TempScreen = ({ navigation }) => {
                                                             }
                                                         </View>
                                                         {touched.directions && errors.directions &&
-                                                            // <Text style={styles.error}>
                                                             <ErrorMessage
                                                                 name={`directions.${index}`}
-                                                                render={msg => <Text style={styles.error}>{msg}</Text>}
+                                                                render={(message) => {
+                                                                    return (
+                                                                        <View style={styles.errorContainer}>
+                                                                            <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                                            <Text style={styles.error}>{message}</Text>
+                                                                        </View>
+                                                                    )
+                                                                }}
                                                             />
-                                                            // </Text>
                                                         }
-                                                        {/* {touched.directions && errors.directions &&
-                                                            <Text style={styles.error}>
-                                                                <ErrorMessage name={`directions.${index}`} />
-                                                            </Text>
-                                                        } */}
                                                     </View>
                                                 ))
                                             );
@@ -429,6 +540,21 @@ var radio_props = [
     { label: "דקה", value: "דקה" },
     { label: "שעה", value: "שעה" },
 ];
+const initialValues = {
+    name: '',
+    quantity: '',
+    category: '',
+    time: {
+        value: '',
+        unit: 'דקה'
+    },
+    ingredients: [{
+        title: '',
+        amount: '',
+        unit: ''
+    }],
+    directions: ['']
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -484,8 +610,16 @@ const styles = StyleSheet.create({
     label: {
         color: 'white'
     },
+    errorContainer: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    errorIcon: {
+        marginRight: 5
+    },
     error: {
-        color: 'red',
+        color: error,
+        fontWeight: 'bold'
     },
     textInput: {
         fontSize: 16,

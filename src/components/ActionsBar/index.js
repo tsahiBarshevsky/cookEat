@@ -90,8 +90,7 @@ const ActionsBar = ({ size }) => {
                 <View style={styles.bottomSheetContainer}>
                     <View style={styles.item}>
                         <TouchableOpacity
-                            onPress={() => onNavigate('Temp')}
-                            // onPress={() => onNavigate('Insertion')}
+                            onPress={() => onNavigate('Insertion')}
                             onPressIn={() => setPressedAdd(true)}
                             onPressOut={() => setPressedAdd(false)}
                             style={[styles.BSButton, pressedAdd && styles.buttonHover]}

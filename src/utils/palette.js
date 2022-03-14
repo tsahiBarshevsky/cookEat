@@ -7,6 +7,7 @@ const selected = 'rgb(18, 31, 37)';
 const unSelected = 'rgba(18, 31, 37, 0.35)';
 const placeholder = 'rgba(255, 255, 255, 0.3)';
 const toast = '#2f3032';
+const error = '#b71c1c';
 
 export {
     background,
@@ -17,5 +18,6 @@ export {
     selected,
     unSelected,
     placeholder,
-    toast
+    toast,
+    error
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, FlatList } from 'react-native';
+import { FlatList } from 'react-native';
 import DirectionBox from '../DirectionBox';
 
 const Directions = ({ directions }) => {
@@ -7,7 +7,7 @@ const Directions = ({ directions }) => {
         <FlatList
             data={directions}
             style={{ marginTop: 5 }}
-            keyExtractor={(item) => item.key}
+            keyExtractor={(item, index) => index}
             contentContainerStyle={{ paddingBottom: 15, marginTop: 5 }}
             showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => {
@@ -15,7 +15,7 @@ const Directions = ({ directions }) => {
                     <DirectionBox
                         key={index}
                         index={index}
-                        value={item.value}
+                        value={item}
                         size={directions.length}
                     />
                 )
