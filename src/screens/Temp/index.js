@@ -7,7 +7,7 @@ import { AntDesign, Entypo, MaterialCommunityIcons } from '@expo/vector-icons';
 import update from 'immutability-helper';
 import { UIActivityIndicator } from 'react-native-indicators';
 import { SharedElement } from 'react-navigation-shared-element';
-import { Formik } from 'formik';
+import { Formik, FieldArray, ErrorMessage } from 'formik';
 import Toast from 'react-native-toast-message';
 import { addNewRecipe } from '../../redux/actions/recipes';
 import { recipeSchema } from '../../utils/recipeSchema';
@@ -49,7 +49,7 @@ const TempScreen = ({ navigation }) => {
     const directionRef = useRef(null);
 
     const onAddNewRecipe = async (newRecipe) => {
-        console.log(newRecipe);
+        console.log("ingredients:", newRecipe.ingredients);
     }
 
     return (
@@ -95,12 +95,12 @@ const TempScreen = ({ navigation }) => {
                     behavior={Platform.OS === 'ios' ? 'padding' : null}
                 >
                     <Formik
-                        initialValues={{ name: '', quantity: '', category: '', time: { value: '', unit: 'דקה' } }}
+                        initialValues={{ name: '', quantity: '', category: '', time: { value: '', unit: 'דקה' }, ingredients: [{ title: '', amount: '', unit: '' }], directions: [{ direction: '' }] }}
                         enableReinitialize
                         onSubmit={(values) => onAddNewRecipe(values)}
                         validationSchema={recipeSchema}
                     >
-                        {({ handleChange, handleSubmit, handleBlur, values, errors, setErrors, touched }) => (
+                        {({ handleChange, handleSubmit, handleBlur, values, errors, setErrors, touched, resetForm }) => (
                             <View>
                                 <View style={styles.textInputWrapper}>
                                     <Text style={styles.label}>שם המתכון</Text>
@@ -192,6 +192,168 @@ const TempScreen = ({ navigation }) => {
                                     </View>
                                 </View>
                                 {touched.time && errors.time && <Text style={styles.error}>{errors.time.value}</Text>}
+                                <Text style={[styles.text, styles.title]}>מרכיבים</Text>
+                                <FieldArray
+                                    name='ingredients'
+                                    render={(arrayHelpers) => {
+                                        const ingredients = values.ingredients;
+                                        return (
+                                            ingredients.map((ingredient, index) => (
+                                                <View key={index}>
+                                                    <View style={styles.dynamicInputWrapper}>
+                                                        <View style={[styles.textInputWrapper, { marginBottom: 0 }]}>
+                                                            <TextInput
+                                                                ref={ingredientRef}
+                                                                placeholder={`מרכיב ${index + 1}`}
+                                                                value={values.ingredients[index].title}
+                                                                onChangeText={handleChange(`ingredients.${index}.title`)}
+                                                                style={styles.textInput}
+                                                                placeholderTextColor={placeholder}
+                                                                underlineColorAndroid="transparent"
+                                                                selectionColor={placeholder}
+                                                                returnKeyType='next'
+                                                                onSubmitEditing={() => amountRef.current.focus()}
+                                                                blurOnSubmit={false}
+                                                                onBlur={handleBlur(`ingredients.${index}.title`)}
+                                                            />
+                                                        </View>
+                                                        <View style={[styles.textInputWrapper, { marginHorizontal: 5, marginBottom: 0 }]}>
+                                                            <TextInput
+                                                                ref={amountRef}
+                                                                placeholder='כמות'
+                                                                value={values.ingredients[index].amount}
+                                                                onChangeText={handleChange(`ingredients.${index}.amount`)}
+                                                                style={styles.textInput}
+                                                                placeholderTextColor={placeholder}
+                                                                underlineColorAndroid="transparent"
+                                                                selectionColor={placeholder}
+                                                                returnKeyType='next'
+                                                                onSubmitEditing={() => unitRef.current.focus()}
+                                                                blurOnSubmit={false}
+                                                                onBlur={handleBlur(`ingredients.${index}.amount`)}
+                                                            />
+                                                        </View>
+                                                        <View style={[styles.textInputWrapper, { marginBottom: 0 }]}>
+                                                            <TextInput
+                                                                ref={unitRef}
+                                                                placeholder='יחידה'
+                                                                value={values.ingredients[index].unit}
+                                                                onChangeText={handleChange(`ingredients.${index}.unit`)}
+                                                                style={styles.textInput}
+                                                                placeholderTextColor={placeholder}
+                                                                underlineColorAndroid="transparent"
+                                                                selectionColor={placeholder}
+                                                                returnKeyType='next'
+                                                                onSubmitEditing={() => {
+                                                                    if (index === values.ingredients.length - 1)
+                                                                        directionRef.current.focus();
+                                                                    else
+                                                                        ingredientRef.current.focus();
+                                                                }}
+                                                                blurOnSubmit={false}
+                                                                onBlur={handleBlur(`ingredients.${index}.unit`)}
+                                                            />
+                                                        </View>
+                                                        {ingredients.length - 1 === index &&
+                                                            <TouchableOpacity
+                                                                onPress={() => arrayHelpers.push({ title: '', amount: '', unit: '' })}
+                                                                style={styles.actionButton}
+                                                                activeOpacity={0.8}
+                                                            >
+                                                                <AntDesign name="plus" size={12} color="blue" />
+                                                            </TouchableOpacity>
+                                                        }
+                                                        {ingredients.length > 1 &&
+                                                            <TouchableOpacity
+                                                                onPress={() => arrayHelpers.remove(index)}
+                                                                style={styles.actionButton}
+                                                                activeOpacity={0.8}
+                                                            >
+                                                                <AntDesign name="minus" size={12} color="red" />
+                                                            </TouchableOpacity>
+                                                        }
+                                                    </View>
+                                                    {touched.ingredients && errors.ingredients &&
+                                                        <Text style={styles.error}>
+                                                            <ErrorMessage name={`ingredients.${index}.title`} />
+                                                        </Text>
+                                                    }
+                                                    {/* {touched.ingredients && errors.ingredients &&
+                                                        <Text style={styles.error}>
+                                                            <ErrorMessage name={`ingredients.${index}.amount`} />
+                                                        </Text>
+                                                    }
+                                                    {touched.ingredients && errors.ingredients &&
+                                                        <Text style={styles.error}>
+                                                            <ErrorMessage name={`ingredients.${index}.unit`} />
+                                                        </Text>
+                                                    } */}
+                                                </View>
+                                            ))
+                                        );
+                                    }}
+                                />
+                                <Text style={[styles.text, styles.title]}>הוראות הכנה</Text>
+                                <FieldArray
+                                    name='directions'
+                                    render={(arrayHelpers) => {
+                                        const directions = values.directions;
+                                        return (
+                                            directions.map((direction, index) => (
+                                                <View key={index}>
+                                                    <View style={styles.dynamicInputWrapper}>
+                                                        <View style={[styles.textInputWrapper, { marginBottom: 0 }]}>
+                                                            <TextInput
+                                                                ref={directionRef}
+                                                                placeholder={`הוראה ${index + 1}`}
+                                                                value={values.directions[index].direction}
+                                                                onChangeText={handleChange(`directions.${index}.direction`)}
+                                                                style={styles.textInput}
+                                                                placeholderTextColor={placeholder}
+                                                                underlineColorAndroid="transparent"
+                                                                selectionColor={placeholder}
+                                                                returnKeyType='next'
+                                                                onSubmitEditing={() => {
+                                                                    if (index === directions.length - 1)
+                                                                        handleSubmit();
+                                                                    else
+                                                                        directionRef.current?.focus();
+                                                                }}
+                                                                blurOnSubmit={false}
+                                                                onBlur={handleBlur(`directions.${index}.direction`)}
+                                                            />
+                                                        </View>
+                                                        {directions.length - 1 === index &&
+                                                            <TouchableOpacity
+                                                                onPress={() => arrayHelpers.push({ direction: '' })}
+                                                                style={styles.actionButton}
+                                                                activeOpacity={0.8}
+                                                            >
+                                                                <AntDesign name="plus" size={12} color="blue" />
+                                                            </TouchableOpacity>
+                                                        }
+                                                        {directions.length > 1 &&
+                                                            <TouchableOpacity
+                                                                onPress={() => arrayHelpers.remove(index)}
+                                                                style={styles.actionButton}
+                                                                activeOpacity={0.8}
+                                                            >
+                                                                <AntDesign name="minus" size={12} color="red" />
+                                                            </TouchableOpacity>
+                                                        }
+                                                    </View>
+                                                    <View>
+                                                        {touched.directions && errors.directions &&
+                                                            <Text style={styles.error}>
+                                                                <ErrorMessage name={`directions.${index}.direction`} />
+                                                            </Text>
+                                                        }
+                                                    </View>
+                                                </View>
+                                            ))
+                                        );
+                                    }}
+                                />
                                 <View style={styles.buttons}>
                                     <TouchableOpacity
                                         onPress={handleSubmit}
@@ -206,7 +368,7 @@ const TempScreen = ({ navigation }) => {
                                         }
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        // onPress={() => clearForm()}
+                                        onPress={resetForm}
                                         style={[styles.button, styles.clear]}
                                         activeOpacity={0.8}
                                         disabled={disabled}
@@ -276,7 +438,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
-        marginBottom: 10,
+        // marginBottom: 10,
         paddingHorizontal: 15,
         paddingVertical: 5
     },
@@ -298,7 +460,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 10,
+        // marginBottom: 10
     },
     text: {
         color: 'white',
