@@ -22,23 +22,21 @@ const recipeSchema = Yup.object().shape({
     //                 .required(required)
     //                 .typeError('ערך זה צריך להיות מספר')
     //     }),
-    ingredients:
-        Yup.array().of(
-            Yup.object().shape({
-                title: Yup.string().required(`שם: ${required}`),
-                amount:
-                    Yup.string()
-                        .matches(/^(?:[1-9]\d*|0)?(?:\/\d+)?$/gm, 'כמות: ערך זה צריך להיות חיובי')
-                        .required(`כמות: ${required}`),
-                unit: Yup.string().required(`יחידה: ${required}`)
-            })
-        ),
-    // directions:
+    // ingredients:
     //     Yup.array().of(
     //         Yup.object().shape({
-    //             direction: Yup.string().required(required)
+    //             title: Yup.string().required(`שם: ${required}`),
+    //             amount:
+    //                 Yup.string()
+    //                     .matches(/^(?:[1-9]\d*|0)?(?:\/\d+)?$/gm, 'כמות: ערך זה צריך להיות חיובי')
+    //                     .required(`כמות: ${required}`),
+    //             unit: Yup.string().required(`יחידה: ${required}`)
     //         })
-    //     )
+    //     ),
+    directions:
+        Yup.array().of(
+            Yup.string().required(required)
+        )
 });
 
 export { recipeSchema };
