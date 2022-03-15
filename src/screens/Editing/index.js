@@ -2,13 +2,16 @@ import React, { useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import uuid from 'react-native-uuid';
 import RadioForm from 'react-native-simple-radio-button';
-import { AntDesign, Entypo } from '@expo/vector-icons';
+import { AntDesign, Entypo, Ionicons } from '@expo/vector-icons';
 import update from 'immutability-helper';
+import { UIActivityIndicator } from 'react-native-indicators';
 import { SharedElement } from 'react-navigation-shared-element';
 import Toast from 'react-native-toast-message';
+import { Formik, FieldArray, ErrorMessage } from 'formik';
 import { useSelector } from 'react-redux';
 import { editRecipe } from '../../redux/actions/recipes';
-import { background, primary, secondary, placeholder } from '../../utils/palette';
+import { recipeSchema } from '../../utils/recipeSchema';
+import { background, primary, secondary, placeholder, error } from '../../utils/palette';
 
 // React native components
 import {
@@ -32,15 +35,18 @@ import { db } from '../../utils/firebase';
 const EditingScreen = ({ route, navigation }) => {
     const { item } = route.params;
     const recipes = useSelector(state => state.recipes);
-    const [name, setName] = useState(item.name);
-    const [time, setTime] = useState(item.time);
-    const [quantity, setQuantity] = useState(item.quantity);
-    const [category, setCategory] = useState(item.category);
-    const [ingredients, setIngredients] = useState(item.ingredients);
-    const [directions, setDirections] = useState(item.directions);
+    const [disabled, setDisabled] = useState(false);
     const dispatch = useDispatch();
 
     const origin = 'Editing';
+    const initialValues = {
+        name: item.name,
+        quantity: item.quantity,
+        category: item.category,
+        time: item.time,
+        ingredients: item.ingredients,
+        directions: item.directions
+    };
 
     // References for next textInput
     const nameRef = useRef(null);
@@ -52,67 +58,8 @@ const EditingScreen = ({ route, navigation }) => {
     const unitRef = useRef(null);
     const directionRef = useRef(null);
 
-    // Ingredients handlers
-    const handleAddIngredient = () => {
-        const _ingredients = [...ingredients];
-        _ingredients.push({ key: uuid.v4() });
-        setIngredients(_ingredients);
-    }
-
-    const handleRemoveIngredient = (key) => {
-        const _ingredients = ingredients.filter((input, index) => index !== key);
-        setIngredients(_ingredients);
-    }
-
-    const handleIngredientTitleChange = (text, key) => {
-        const _ingredients = [...ingredients];
-        _ingredients[key].title = text;
-        setIngredients(_ingredients);
-    }
-
-    const handleIngredientAmountChange = (text, key) => {
-        const _ingredients = [...ingredients];
-        _ingredients[key].amount = text;
-        setIngredients(_ingredients);
-    }
-
-    const handleIngredientUnitChange = (text, key) => {
-        const _ingredients = [...ingredients];
-        _ingredients[key].unit = text;
-        setIngredients(_ingredients);
-    }
-
-    // Directions handlers
-    const handleAddDirection = (index) => {
-        const _directions = [...directions];
-        _directions.push({});
-        setDirections(_directions);
-    }
-
-    const handleRemoveDirection = (key) => {
-        const _directions = directions.filter((input, index) => index !== key);
-        setDirections(_directions);
-    }
-
-    const handleDirectionChange = (text, key) => {
-        const _directions = [...directions];
-        _directions[key].value = text;
-        _directions[key].key = key;
-        setDirections(_directions);
-    }
-
-    const onEditRecipe = async () => {
-        const editedRecipe = {
-            name: name,
-            quantity: quantity,
-            category: category,
-            time: {
-                value: time.value,
-                unit: time.value > 1 ? (time.unit === 'דקה' ? 'דקות' : 'שעות') : (time.unit === 'דקה' ? 'דקה' : 'שעה')
-            },
-            ingredients: ingredients,
-            directions: directions,
-        };
+    const onEditRecipe = async (editedRecipe) => {
+        setDisabled(true);
         const recipeRef = doc(db, "recipes", item.id);
         try {
             // Update document on Firestore
@@ -182,216 +129,354 @@ const EditingScreen = ({ route, navigation }) => {
                     enabled
                     behavior={Platform.OS === 'ios' ? 'padding' : null}
                 >
-                    <View style={styles.textInputWrapper}>
-                        <Text style={styles.label}>שם המתכון</Text>
-                        <TextInput
-                            value={name}
-                            ref={nameRef}
-                            placeholder='איך קוראים למנה?'
-                            onChangeText={(text) => setName(text)}
-                            style={styles.textInput}
-                            placeholderTextColor={placeholder}
-                            underlineColorAndroid="transparent"
-                            selectionColor={placeholder}
-                            returnKeyType='next'
-                            onSubmitEditing={() => quantityRef.current.focus()}
-                            blurOnSubmit={false}
-                        />
-                    </View>
-                    <View style={styles.textInputWrapper}>
-                        <Text style={styles.label}>כמות מנות</Text>
-                        <TextInput
-                            value={quantity}
-                            ref={quantityRef}
-                            keyboardType='numeric'
-                            placeholder='לכמה אנשים הוא מספיק?'
-                            onChangeText={(text) => setQuantity(text)}
-                            style={styles.textInput}
-                            placeholderTextColor={placeholder}
-                            underlineColorAndroid="transparent"
-                            selectionColor={placeholder}
-                            returnKeyType='next'
-                            onSubmitEditing={() => categoryRef.current.focus()}
-                            blurOnSubmit={false}
-                        />
-                    </View>
-                    <View style={styles.textInputWrapper}>
-                        <Text style={styles.label}>קטגוריה</Text>
-                        <TextInput
-                            value={category}
-                            ref={categoryRef}
-                            placeholder='לאיזו קטגוריה הוא שייך?'
-                            onChangeText={(text) => setCategory(text)}
-                            style={styles.textInput}
-                            placeholderTextColor={placeholder}
-                            underlineColorAndroid="transparent"
-                            selectionColor={placeholder}
-                            returnKeyType='next'
-                            onSubmitEditing={() => timeRef.current.focus()}
-                            blurOnSubmit={false}
-                        />
-                    </View>
-                    <View style={[styles.textInputWrapper, { paddingRight: 3 }]}>
-                        <Text style={styles.label}>זמן הכנה</Text>
-                        <View style={styles.timeWrapper}>
-                            <TextInput
-                                value={time.value}
-                                ref={timeRef}
-                                keyboardType='numeric'
-                                placeholder='בכמה זמן מכינים אותו?'
-                                onChangeText={(text) => {
-                                    var updated = update(time, { value: { $set: text } });
-                                    setTime(updated);
-                                }}
-                                style={styles.textInput}
-                                placeholderTextColor={placeholder}
-                                underlineColorAndroid="transparent"
-                                selectionColor={placeholder}
-                                returnKeyType='next'
-                                onSubmitEditing={() => ingredientRef.current.focus()}
-                                blurOnSubmit={false}
-                            />
-                            <RadioForm
-                                radio_props={radio_props}
-                                formHorizontal
-                                initial={item.time.unit === 'שעות' ? 1 : 0}
-                                onPress={(value) => {
-                                    var updated = update(time, { unit: { $set: value } });
-                                    setTime(updated);
-                                }}
-                                buttonColor={placeholder}
-                                buttonSize={10}
-                                selectedButtonColor={placeholder}
-                                selectedLabelColor='white'
-                                labelColor='white'
-                                labelStyle={{ marginLeft: 10, fontSize: 17 }}
-                                style={styles.radioForm}
-                            />
-                        </View>
-                    </View>
-                    <Text style={[styles.text, styles.title]}>מרכיבים</Text>
-                    {ingredients.map((ingredient, index) => (
-                        <View key={index} style={styles.dynamicInputWrapper}>
-                            <View style={[styles.textInputWrapper, { marginBottom: 0 }]}>
-                                <TextInput
-                                    ref={ingredientRef}
-                                    placeholder={`מרכיב ${index + 1}`}
-                                    value={ingredient.title}
-                                    onChangeText={(text) => handleIngredientTitleChange(text, index)}
-                                    style={styles.textInput}
-                                    placeholderTextColor={placeholder}
-                                    underlineColorAndroid="transparent"
-                                    selectionColor={placeholder}
-                                    returnKeyType='next'
-                                    onSubmitEditing={() => amountRef.current.focus()}
-                                    blurOnSubmit={false}
-                                />
-                            </View>
-                            <View style={[styles.textInputWrapper, { marginHorizontal: 5, marginBottom: 0 }]}>
-                                <TextInput
-                                    ref={amountRef}
-                                    placeholder='כמות'
-                                    value={ingredient.amount}
-                                    onChangeText={(text) => handleIngredientAmountChange(text, index)}
-                                    style={styles.textInput}
-                                    placeholderTextColor={placeholder}
-                                    underlineColorAndroid="transparent"
-                                    selectionColor={placeholder}
-                                    returnKeyType='next'
-                                    onSubmitEditing={() => unitRef.current.focus()}
-                                    blurOnSubmit={false}
-                                />
-                            </View>
-                            <View style={[styles.textInputWrapper, { marginBottom: 0 }]}>
-                                <TextInput
-                                    ref={unitRef}
-                                    placeholder='יחידה'
-                                    value={ingredient.unit}
-                                    onChangeText={(text) => handleIngredientUnitChange(text, index)}
-                                    style={styles.textInput}
-                                    placeholderTextColor={placeholder}
-                                    underlineColorAndroid="transparent"
-                                    selectionColor={placeholder}
-                                    returnKeyType='next'
-                                    onSubmitEditing={() => {
-                                        if (index === ingredients.length - 1)
-                                            directionRef.current.focus();
-                                        else
-                                            ingredientRef.current.focus();
-                                    }}
-                                    blurOnSubmit={false}
-                                />
-                            </View>
-                            {ingredients.length - 1 === index &&
-                                <TouchableOpacity
-                                    onPress={() => handleAddIngredient()}
-                                    style={styles.actionButton}
-                                    activeOpacity={0.8}
-                                >
-                                    <AntDesign name="plus" size={12} color="blue" />
-                                </TouchableOpacity>
-                            }
-                            {ingredients.length > 1 &&
-                                <TouchableOpacity
-                                    onPress={() => handleRemoveIngredient(index)}
-                                    style={styles.actionButton}
-                                    activeOpacity={0.8}
-                                >
-                                    <AntDesign name="minus" size={12} color="red" />
-                                </TouchableOpacity>
-                            }
-                        </View>
-                    ))}
-                    <Text style={[styles.text, styles.title]}>הוראות הכנה</Text>
-                    {directions.map((direction, index) => (
-                        <View key={index} style={styles.dynamicInputWrapper}>
-                            <View style={[styles.textInputWrapper, { marginBottom: 0 }]}>
-                                <TextInput
-                                    ref={directionRef}
-                                    placeholder={`הוראה ${index + 1}`}
-                                    value={direction.value}
-                                    onChangeText={(text) => handleDirectionChange(text, index)}
-                                    style={styles.textInput}
-                                    placeholderTextColor={placeholder}
-                                    underlineColorAndroid="transparent"
-                                    selectionColor={placeholder}
-                                    returnKeyType='go'
-                                    blurOnSubmit={index === directions.length - 1 ? true : false}
-                                    onSubmitEditing={() => {
-                                        if (index === directions.length - 1)
-                                            onEditRecipe();
-                                        else
-                                            directionRef.current?.focus();
-                                    }}
-                                />
-                            </View>
-                            {directions.length - 1 === index &&
-                                <TouchableOpacity
-                                    onPress={() => handleAddDirection(index)}
-                                    style={styles.actionButton}
-                                    activeOpacity={0.8}
-                                >
-                                    <AntDesign name="plus" size={12} color="blue" />
-                                </TouchableOpacity>
-                            }
-                            {directions.length > 1 &&
-                                <TouchableOpacity
-                                    onPress={() => handleRemoveDirection(index)}
-                                    style={styles.actionButton}
-                                    activeOpacity={0.8}
-                                >
-                                    <AntDesign name="minus" size={12} color="red" />
-                                </TouchableOpacity>
-                            }
-                        </View>
-                    ))}
-                    <TouchableOpacity
-                        onPress={onEditRecipe}
-                        style={styles.button}
-                        activeOpacity={0.8}
+                    <Formik
+                        initialValues={initialValues}
+                        enableReinitialize
+                        onSubmit={(values) => onEditRecipe(values)}
+                        validationSchema={recipeSchema}
                     >
-                        <Text style={styles.text}>עריכה</Text>
-                    </TouchableOpacity>
+                        {({ handleChange, handleSubmit, handleBlur, values, errors, setErrors, touched, resetForm }) => {
+                            return (
+                                <View>
+                                    <View style={[styles.textInputWrapper, { marginTop: 0 }]}>
+                                        <Text style={styles.label}>שם המתכון</Text>
+                                        <TextInput
+                                            value={values.name}
+                                            ref={nameRef}
+                                            placeholder='איך קוראים למנה?'
+                                            onChangeText={handleChange('name')}
+                                            style={styles.textInput}
+                                            placeholderTextColor={placeholder}
+                                            underlineColorAndroid="transparent"
+                                            selectionColor={placeholder}
+                                            returnKeyType='next'
+                                            onSubmitEditing={() => quantityRef.current.focus()}
+                                            blurOnSubmit={false}
+                                            onBlur={handleBlur('name')}
+                                        />
+                                    </View>
+                                    <ErrorMessage
+                                        name='name'
+                                        render={(message) => {
+                                            return (
+                                                <View style={styles.errorContainer}>
+                                                    <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                    <Text style={styles.error}>{message}</Text>
+                                                </View>
+                                            )
+                                        }}
+                                    />
+                                    <View style={styles.textInputWrapper}>
+                                        <Text style={styles.label}>כמות מנות</Text>
+                                        <TextInput
+                                            value={values.quantity}
+                                            ref={quantityRef}
+                                            keyboardType='numeric'
+                                            placeholder='לכמה אנשים הוא מספיק?'
+                                            onChangeText={handleChange('quantity')}
+                                            style={styles.textInput}
+                                            placeholderTextColor={placeholder}
+                                            underlineColorAndroid="transparent"
+                                            selectionColor={placeholder}
+                                            returnKeyType='next'
+                                            onSubmitEditing={() => categoryRef.current.focus()}
+                                            blurOnSubmit={false}
+                                            onBlur={handleBlur('quantity')}
+                                        />
+                                    </View>
+                                    <ErrorMessage
+                                        name='quantity'
+                                        render={(message) => {
+                                            return (
+                                                <View style={styles.errorContainer}>
+                                                    <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                    <Text style={styles.error}>{message}</Text>
+                                                </View>
+                                            )
+                                        }}
+                                    />
+                                    <View style={styles.textInputWrapper}>
+                                        <Text style={styles.label}>קטגוריה</Text>
+                                        <TextInput
+                                            value={values.category}
+                                            ref={categoryRef}
+                                            placeholder='לאיזו קטגוריה הוא שייך?'
+                                            onChangeText={handleChange('category')}
+                                            style={styles.textInput}
+                                            placeholderTextColor={placeholder}
+                                            underlineColorAndroid="transparent"
+                                            selectionColor={placeholder}
+                                            returnKeyType='next'
+                                            onSubmitEditing={() => timeRef.current.focus()}
+                                            blurOnSubmit={false}
+                                            onBlur={handleBlur('category')}
+                                        />
+                                    </View>
+                                    <ErrorMessage
+                                        name='category'
+                                        render={(message) => {
+                                            return (
+                                                <View style={styles.errorContainer}>
+                                                    <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                    <Text style={styles.error}>{message}</Text>
+                                                </View>
+                                            )
+                                        }}
+                                    />
+                                    <View style={[styles.textInputWrapper, { paddingRight: 3 }]}>
+                                        <Text style={styles.label}>זמן הכנה</Text>
+                                        <View style={styles.timeWrapper}>
+                                            <TextInput
+                                                value={values.time.value}
+                                                ref={timeRef}
+                                                keyboardType='numeric'
+                                                placeholder='בכמה זמן מכינים אותו?'
+                                                onChangeText={handleChange('time.value')}
+                                                style={styles.textInput}
+                                                placeholderTextColor={placeholder}
+                                                underlineColorAndroid="transparent"
+                                                selectionColor={placeholder}
+                                                returnKeyType='next'
+                                                onSubmitEditing={() => ingredientRef.current.focus()}
+                                                blurOnSubmit={false}
+                                                onBlur={handleBlur('time.value')}
+                                            />
+                                            <RadioForm
+                                                radio_props={radio_props}
+                                                formHorizontal
+                                                initial={0}
+                                                onPress={handleChange('time.unit')}
+                                                buttonColor={placeholder}
+                                                buttonSize={10}
+                                                selectedButtonColor={placeholder}
+                                                selectedLabelColor='white'
+                                                labelColor='white'
+                                                labelStyle={{ marginLeft: 10, fontSize: 17 }}
+                                                style={styles.radioForm}
+                                            />
+                                        </View>
+                                    </View>
+                                    <ErrorMessage
+                                        name='time.value'
+                                        render={(message) => {
+                                            return (
+                                                <View style={styles.errorContainer}>
+                                                    <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                    <Text style={styles.error}>{message}</Text>
+                                                </View>
+                                            )
+                                        }}
+                                    />
+                                    <Text style={[styles.text, styles.title]}>מרכיבים</Text>
+                                    <FieldArray
+                                        name='ingredients'
+                                        render={(arrayHelpers) => {
+                                            const ingredients = values.ingredients;
+                                            return (
+                                                ingredients.map((ingredient, index) => {
+                                                    return (
+                                                        <View key={index}>
+                                                            <View style={styles.dynamicInputWrapper}>
+                                                                <View style={[styles.textInputWrapper, { marginBottom: 0 }]}>
+                                                                    <TextInput
+                                                                        ref={ingredientRef}
+                                                                        placeholder={`מרכיב ${index + 1}`}
+                                                                        value={values.ingredients[index].title}
+                                                                        onChangeText={handleChange(`ingredients.${index}.title`)}
+                                                                        style={styles.textInput}
+                                                                        placeholderTextColor={placeholder}
+                                                                        underlineColorAndroid="transparent"
+                                                                        selectionColor={placeholder}
+                                                                        returnKeyType='next'
+                                                                        onSubmitEditing={() => amountRef.current.focus()}
+                                                                        blurOnSubmit={false}
+                                                                        onBlur={handleBlur(`ingredients.${index}.title`)}
+                                                                    />
+                                                                </View>
+                                                                <View style={[styles.textInputWrapper, { marginHorizontal: 5, marginBottom: 0 }]}>
+                                                                    <TextInput
+                                                                        ref={amountRef}
+                                                                        placeholder='כמות'
+                                                                        value={values.ingredients[index].amount}
+                                                                        onChangeText={handleChange(`ingredients.${index}.amount`)}
+                                                                        style={styles.textInput}
+                                                                        placeholderTextColor={placeholder}
+                                                                        underlineColorAndroid="transparent"
+                                                                        selectionColor={placeholder}
+                                                                        returnKeyType='next'
+                                                                        onSubmitEditing={() => unitRef.current.focus()}
+                                                                        blurOnSubmit={false}
+                                                                        onBlur={handleBlur(`ingredients.${index}.amount`)}
+                                                                    />
+                                                                </View>
+                                                                <View style={[styles.textInputWrapper, { marginBottom: 0 }]}>
+                                                                    <TextInput
+                                                                        ref={unitRef}
+                                                                        placeholder='יחידה'
+                                                                        value={values.ingredients[index].unit}
+                                                                        onChangeText={handleChange(`ingredients.${index}.unit`)}
+                                                                        style={styles.textInput}
+                                                                        placeholderTextColor={placeholder}
+                                                                        underlineColorAndroid="transparent"
+                                                                        selectionColor={placeholder}
+                                                                        returnKeyType='next'
+                                                                        onSubmitEditing={() => {
+                                                                            if (index === values.ingredients.length - 1)
+                                                                                directionRef.current.focus();
+                                                                            else
+                                                                                ingredientRef.current.focus();
+                                                                        }}
+                                                                        blurOnSubmit={false}
+                                                                        onBlur={handleBlur(`ingredients.${index}.unit`)}
+                                                                    />
+                                                                </View>
+                                                                {ingredients.length - 1 === index &&
+                                                                    <TouchableOpacity
+                                                                        onPress={() => arrayHelpers.push({ title: '', amount: '', unit: '' })}
+                                                                        style={styles.actionButton}
+                                                                        activeOpacity={0.8}
+                                                                    >
+                                                                        <AntDesign name="plus" size={12} color="blue" />
+                                                                    </TouchableOpacity>
+                                                                }
+                                                                {ingredients.length > 1 &&
+                                                                    <TouchableOpacity
+                                                                        onPress={() => arrayHelpers.remove(index)}
+                                                                        style={styles.actionButton}
+                                                                        activeOpacity={0.8}
+                                                                    >
+                                                                        <AntDesign name="minus" size={12} color="red" />
+                                                                    </TouchableOpacity>
+                                                                }
+                                                            </View>
+                                                            {touched.ingredients && errors.ingredients && errors.ingredients[index] &&
+                                                                <ErrorMessage
+                                                                    name={`ingredients.${index}.title`}
+                                                                    render={(message) => {
+                                                                        return (
+                                                                            <View style={styles.errorContainer}>
+                                                                                <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                                                <Text style={styles.error}>{message}</Text>
+                                                                            </View>
+                                                                        )
+                                                                    }}
+                                                                />
+                                                            }
+                                                            {touched.ingredients && errors.ingredients && errors.ingredients[index] &&
+                                                                <ErrorMessage
+                                                                    name={`ingredients.${index}.amount`}
+                                                                    render={(message) => {
+                                                                        return (
+                                                                            <View style={styles.errorContainer}>
+                                                                                <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                                                <Text style={styles.error}>{message}</Text>
+                                                                            </View>
+                                                                        )
+                                                                    }}
+                                                                />
+                                                            }
+                                                            {touched.ingredients && errors.ingredients && errors.ingredients[index] &&
+                                                                <ErrorMessage
+                                                                    name={`ingredients.${index}.unit`}
+                                                                    render={(message) => {
+                                                                        return (
+                                                                            <View style={styles.errorContainer}>
+                                                                                <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                                                <Text style={styles.error}>{message}</Text>
+                                                                            </View>
+                                                                        )
+                                                                    }}
+                                                                />
+                                                            }
+                                                        </View>
+                                                    )
+                                                })
+                                            );
+                                        }}
+                                    />
+                                    <Text style={[styles.text, styles.title]}>הוראות הכנה</Text>
+                                    <FieldArray
+                                        name='directions'
+                                        render={(arrayHelpers) => {
+                                            const directions = values.directions;
+                                            return (
+                                                directions.map((direction, index) => (
+                                                    <View key={index}>
+                                                        <View style={styles.dynamicInputWrapper}>
+                                                            <View style={[styles.textInputWrapper, { marginBottom: 0 }]}>
+                                                                <TextInput
+                                                                    ref={directionRef}
+                                                                    placeholder={`הוראה ${index + 1}`}
+                                                                    value={values.directions[index]}
+                                                                    onChangeText={handleChange(`directions.${index}`)}
+                                                                    style={styles.textInput}
+                                                                    placeholderTextColor={placeholder}
+                                                                    underlineColorAndroid="transparent"
+                                                                    selectionColor={placeholder}
+                                                                    returnKeyType='next'
+                                                                    onSubmitEditing={() => {
+                                                                        if (index === directions.length - 1)
+                                                                            handleSubmit();
+                                                                        else
+                                                                            directionRef.current?.focus();
+                                                                    }}
+                                                                    blurOnSubmit={false}
+                                                                    onBlur={handleBlur(`directions.${index}`)}
+                                                                />
+                                                            </View>
+                                                            {directions.length - 1 === index &&
+                                                                <TouchableOpacity
+                                                                    onPress={() => arrayHelpers.push('')}
+                                                                    style={styles.actionButton}
+                                                                    activeOpacity={0.8}
+                                                                >
+                                                                    <AntDesign name="plus" size={12} color="blue" />
+                                                                </TouchableOpacity>
+                                                            }
+                                                            {directions.length > 1 &&
+                                                                <TouchableOpacity
+                                                                    onPress={() => arrayHelpers.remove(index)}
+                                                                    style={styles.actionButton}
+                                                                    activeOpacity={0.8}
+                                                                >
+                                                                    <AntDesign name="minus" size={12} color="red" />
+                                                                </TouchableOpacity>
+                                                            }
+                                                        </View>
+                                                        {touched.directions && errors.directions &&
+                                                            <ErrorMessage
+                                                                name={`directions.${index}`}
+                                                                render={(message) => {
+                                                                    return (
+                                                                        <View style={styles.errorContainer}>
+                                                                            <Ionicons style={styles.errorIcon} name="warning-outline" size={15} color={error} />
+                                                                            <Text style={styles.error}>{message}</Text>
+                                                                        </View>
+                                                                    )
+                                                                }}
+                                                            />
+                                                        }
+                                                    </View>
+                                                ))
+                                            );
+                                        }}
+                                    />
+                                    <TouchableOpacity
+                                        onPress={handleSubmit}
+                                        style={[styles.button, styles.add]}
+                                        activeOpacity={0.8}
+                                        disabled={disabled}
+                                    >
+                                        {!disabled ?
+                                            <Text style={styles.text}>עריכה</Text>
+                                            :
+                                            <UIActivityIndicator size={25} count={12} color='white' />
+                                        }
+                                    </TouchableOpacity>
+                                </View>
+                            )
+                        }}
+                    </Formik>
                 </KeyboardAvoidingView>
             </ScrollView>
         </SafeAreaView>
@@ -432,6 +517,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 5
     },
+    upload: {
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        backgroundColor: secondary
+    },
     image: {
         width: 40,
         height: 40,
@@ -443,12 +536,23 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
-        marginBottom: 10,
         paddingHorizontal: 15,
-        paddingVertical: 5
+        paddingVertical: 5,
+        marginTop: 10
     },
     label: {
         color: 'white'
+    },
+    errorContainer: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    errorIcon: {
+        marginRight: 5
+    },
+    error: {
+        color: error,
+        fontWeight: 'bold'
     },
     textInput: {
         fontSize: 16,
@@ -462,7 +566,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 10,
     },
     text: {
         color: 'white',
@@ -477,7 +580,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 5,
-        elevation: 2
+        elevation: 2,
+        marginTop: 10
     },
     timeWrapper: {
         flexDirection: 'row',
@@ -493,13 +597,20 @@ const styles = StyleSheet.create({
         height: 40,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 10,
-        elevation: 1
+        marginTop: 15,
+        elevation: 1,
+    },
+    add: {
+        backgroundColor: secondary,
+    },
+    clear: {
+        borderColor: secondary,
+        borderWidth: 1
     },
     title: {
         fontSize: 20,
         fontWeight: 'bold',
         color: 'white',
-        marginVertical: 10
+        marginTop: 10,
     }
 });

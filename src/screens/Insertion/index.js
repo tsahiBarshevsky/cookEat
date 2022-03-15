@@ -6,7 +6,7 @@ import RadioForm from 'react-native-simple-radio-button';
 import { AntDesign, Entypo, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { UIActivityIndicator } from 'react-native-indicators';
 import { SharedElement } from 'react-navigation-shared-element';
-import { Formik, FieldArray, ErrorMessage, getIn } from 'formik';
+import { Formik, FieldArray, ErrorMessage } from 'formik';
 import Toast from 'react-native-toast-message';
 import { addNewRecipe } from '../../redux/actions/recipes';
 import { recipeSchema } from '../../utils/recipeSchema';
@@ -32,9 +32,8 @@ import {
 import { doc, setDoc } from 'firebase/firestore/lite';
 import { authentication, db } from '../../utils/firebase';
 
-const TempScreen = ({ navigation }) => {
+const InsertionScreen = ({ navigation }) => {
     const [image, setImage] = useState(null);
-    const [formKey, setFormKey] = useState(0);
     const [disabled, setDisabled] = useState(false);
     const dispatch = useDispatch();
 
@@ -292,7 +291,6 @@ const TempScreen = ({ navigation }) => {
                                                 selectedLabelColor='white'
                                                 labelColor='white'
                                                 labelStyle={{ marginLeft: 10, fontSize: 17 }}
-                                                key={formKey}
                                                 style={styles.radioForm}
                                             />
                                         </View>
@@ -534,7 +532,7 @@ const TempScreen = ({ navigation }) => {
     )
 }
 
-export default TempScreen;
+export default InsertionScreen;
 
 var radio_props = [
     { label: "דקה", value: "דקה" },
