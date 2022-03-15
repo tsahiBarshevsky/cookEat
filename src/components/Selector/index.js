@@ -1,21 +1,33 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native';
 import { selected, unSelected } from '../../utils/palette';
 
 const Selector = ({ categories, selectedCategory, setSelectedCategory }) => {
     const allRecipes = ['כל המתכונים'];
+    const [data, setData] = useState([]);
+    const flatlistRef = useRef(null);
+
+    useEffect(() => {
+        setData(categories);
+    }, [categories]);
 
     return (
         <View style={styles.container}>
             <FlatList
-                data={allRecipes.concat(categories).reverse()}
+                data={allRecipes.concat(data).reverse()}
+                ref={flatlistRef}
                 keyExtractor={(item) => item}
                 horizontal
                 inverted
-                initialScrollIndex={categories.length}
                 showsHorizontalScrollIndicator={false}
                 style={styles.flatlist}
                 ItemSeparatorComponent={() => <View style={{ paddingHorizontal: 5 }} />}
+                onLayout={() => flatlistRef.current?.scrollToEnd({ animated: true })}
+                onContentSizeChange={() => {
+                    setTimeout(() => {
+                        flatlistRef.current?.scrollToEnd({ animated: true });
+                    }, 200);
+                }}
                 renderItem={({ item }) => {
                     return (
                         <TouchableOpacity
