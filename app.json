@@ -6,6 +6,20 @@
     "orientation": "portrait",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "backgroundColor": "#000f14"
+    },
+    "ios": {
+      "bundleIdentifier": "com.tsahiBarshavsky.cookEat",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "com.tsahiBarshavsky.cookEat",
+      "versionCode": 1
+    }
   }
 }

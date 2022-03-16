@@ -123,7 +123,9 @@ const InsertionScreen = ({ navigation }) => {
     }
 
     useEffect(() => {
-        nameRef.current?.focus();
+        setTimeout(() => {
+            nameRef.current?.focus();
+        }, 200);
     }, []);
 
     return (
