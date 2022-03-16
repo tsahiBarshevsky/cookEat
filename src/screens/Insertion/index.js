@@ -83,6 +83,10 @@ const InsertionScreen = ({ navigation }) => {
 
     const onAddNewRecipe = async (newRecipe) => {
         setDisabled(true);
+        newRecipe.time.unit = newRecipe.time.value > 1 ?
+            (newRecipe.time.unit === 'דקה' ? 'דקות' : 'שעות')
+            :
+            (newRecipe.time.unit === 'דקה' ? 'דקה' : 'שעה');
         // Generate new recipe constant data
         newRecipe.id = uuid.v4();
         newRecipe.owner = authentication.currentUser.email;

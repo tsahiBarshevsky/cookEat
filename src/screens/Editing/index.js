@@ -60,6 +60,10 @@ const EditingScreen = ({ route, navigation }) => {
 
     const onEditRecipe = async (editedRecipe) => {
         setDisabled(true);
+        editedRecipe.time.unit = editedRecipe.time.value > 1 ?
+            (editedRecipe.time.unit === 'דקה' ? 'דקות' : 'שעות')
+            :
+            (editedRecipe.time.unit === 'דקה' ? 'דקה' : 'שעה');
         const recipeRef = doc(db, "recipes", item.id);
         try {
             // Update document on Firestore
@@ -244,7 +248,7 @@ const EditingScreen = ({ route, navigation }) => {
                                             <RadioForm
                                                 radio_props={radio_props}
                                                 formHorizontal
-                                                initial={0}
+                                                initial={item.time.unit === 'שעות' ? 1 : 0}
                                                 onPress={handleChange('time.unit')}
                                                 buttonColor={placeholder}
                                                 buttonSize={10}

@@ -26,10 +26,7 @@ const recipeSchema = Yup.object().shape({
         Yup.array().of(
             Yup.object().shape({
                 title: Yup.string().required(`שם: ${required}`),
-                amount:
-                    Yup.string()
-                        .matches(/^(?:[1-9]\d*|0)?(?:\/\d+)?$/gm, 'כמות: ערך זה צריך להיות חיובי')
-                        .required(`כמות: ${required}`),
+                amount: Yup.string().required(`כמות: ${required}`),
                 unit: Yup.string().required(`יחידה: ${required}`)
             })
         ),
