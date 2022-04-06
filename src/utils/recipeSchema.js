@@ -7,13 +7,13 @@ Yup.addMethod(Yup.string, 'castToNumber', function () {
 });
 
 const recipeSchema = Yup.object().shape({
-    name: Yup.string().required(required),
+    name: Yup.string().trim().required(required),
     quantity:
         Yup.number()
             .moreThan(0, 'ערך זה צריך להיות חיובי')
             .required(required)
             .typeError('ערך זה צריך להיות מספר'),
-    category: Yup.string().required(required),
+    category: Yup.string().trim().required(required),
     time:
         Yup.object().shape({
             value:
@@ -25,14 +25,14 @@ const recipeSchema = Yup.object().shape({
     ingredients:
         Yup.array().of(
             Yup.object().shape({
-                title: Yup.string().required(`שם: ${required}`),
-                amount: Yup.string().required(`כמות: ${required}`),
-                unit: Yup.string().required(`יחידה: ${required}`)
+                title: Yup.string().trim().required(`שם: ${required}`),
+                amount: Yup.string().trim().required(`כמות: ${required}`),
+                unit: Yup.string().trim().required(`יחידה: ${required}`)
             })
         ),
     directions:
         Yup.array().of(
-            Yup.string().required(required)
+            Yup.string().trim().required(required)
         )
 });
 

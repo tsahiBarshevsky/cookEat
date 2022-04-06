@@ -83,10 +83,11 @@ const InsertionScreen = ({ navigation }) => {
 
     const onAddNewRecipe = async (newRecipe) => {
         setDisabled(true);
-        newRecipe.time.unit = newRecipe.time.value > 1 ?
-            (newRecipe.time.unit === 'דקה' ? 'דקות' : 'שעות')
-            :
-            (newRecipe.time.unit === 'דקה' ? 'דקה' : 'שעה');
+        if (newRecipe.time.value > 1 && newRecipe.time.unit === 'דקה')
+            newRecipe.time.unit = 'דקות';
+        else
+            if (newRecipe.time.value > 1 && newRecipe.time.unit === 'שעה')
+                newRecipe.time.unit = 'שעות';
         // Generate new recipe constant data
         newRecipe.id = uuid.v4();
         newRecipe.owner = authentication.currentUser.email;
@@ -458,6 +459,7 @@ const InsertionScreen = ({ navigation }) => {
                                                                     placeholderTextColor={placeholder}
                                                                     underlineColorAndroid="transparent"
                                                                     selectionColor={placeholder}
+                                                                    multiline
                                                                     returnKeyType='next'
                                                                     onSubmitEditing={() => {
                                                                         if (index === directions.length - 1)

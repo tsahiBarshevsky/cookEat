@@ -132,7 +132,7 @@ const RecipeScreen = ({ route, navigation }) => {
                         >
                             <Detail
                                 type={'quantity'}
-                                value={`${item.quantity} מנות`}
+                                value={Number(item.quantity) === 1 ? 'מנה אחת' : `${item.quantity} מנות`}
                             />
                         </Animatable.View>
                         <View style={styles.seperator} />

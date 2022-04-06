@@ -60,10 +60,11 @@ const EditingScreen = ({ route, navigation }) => {
 
     const onEditRecipe = async (editedRecipe) => {
         setDisabled(true);
-        editedRecipe.time.unit = editedRecipe.time.value > 1 ?
-            (editedRecipe.time.unit === 'דקה' ? 'דקות' : 'שעות')
-            :
-            (editedRecipe.time.unit === 'דקה' ? 'דקה' : 'שעה');
+        if (editedRecipe.time.value > 1 && editedRecipe.time.unit === 'דקה')
+            editedRecipe.time.unit = 'דקות';
+        else
+            if (editedRecipe.time.value > 1 && editedRecipe.time.unit === 'שעה')
+                editedRecipe.time.unit = 'שעות';
         const recipeRef = doc(db, "recipes", item.id);
         try {
             // Update document on Firestore
@@ -417,6 +418,7 @@ const EditingScreen = ({ route, navigation }) => {
                                                                     placeholderTextColor={placeholder}
                                                                     underlineColorAndroid="transparent"
                                                                     selectionColor={placeholder}
+                                                                    multiline
                                                                     returnKeyType='next'
                                                                     onSubmitEditing={() => {
                                                                         if (index === directions.length - 1)
