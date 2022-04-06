@@ -17,9 +17,9 @@ const Detail = ({ value, type }) => {
             case 'quantity':
                 return (
                     <MaterialCommunityIcons
-                        style={[styles.icon, styles.quantity]}
+                        style={styles.icon}
                         name="circle-double"
-                        size={20}
+                        size={25}
                         color="#FFFFFF"
                     />
                 );
@@ -38,8 +38,8 @@ const Detail = ({ value, type }) => {
 
     return (
         <View style={styles.container}>
-            <View>{renderIcon()}</View>
-            <Text style={[styles.text, type === 'time' && styles.move]}>{value}</Text>
+            <View style={styles.iconWrapper}>{renderIcon()}</View>
+            <Text style={styles.text}>{value}</Text>
         </View>
     )
 }
@@ -49,19 +49,17 @@ export default Detail;
 const styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     text: {
         fontSize: 17,
         color: 'white'
     },
-    move: {
-        transform: [{ translateY: 1 }]
-    },
-    icon: {
-        marginBottom: 2.5
-    },
-    quantity: {
-        marginTop: -2
+    iconWrapper: {
+        width: 25,
+        height: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 2.5,
     }
 });
